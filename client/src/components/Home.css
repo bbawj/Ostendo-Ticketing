@@ -1,0 +1,33 @@
+.home {
+  height: 95%;
+  padding-top: 3em;
+  padding-left: 3em;
+}
+
+.createTicket {
+  display: flex;
+  flex-direction: column;
+}
+
+.ticketHeader {
+  display: flex;
+  align-items: flex-end;
+}
+
+.createTicket > form {
+  margin-top: 1em;
+  width: 70%;
+}
+
+.createTicket .MuiInputBase-root {
+  margin: 0.5em 0;
+}
+
+.createTicket .MuiButton-root {
+  background-color: var(--theme);
+  color: white;
+}
+
+.myTickets > h2 {
+  margin: 1em 0;
+}

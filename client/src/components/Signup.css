@@ -1,0 +1,31 @@
+.signup {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 3em auto 0 auto;
+  padding: 1em;
+  background-color: white;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  width: 70%;
+  max-width: 600px;
+  height: 70%;
+}
+
+.signup > h2 {
+  padding-bottom: 1em;
+}
+
+.formFields {
+  margin: 1em;
+}
+
+.signup form {
+  text-align: center;
+  width: 50%;
+}
+
+.signup .MuiButton-root {
+  background-color: var(--theme);
+  color: white;
+}
