@@ -1,0 +1,79 @@
+.ticket {
+  margin-top: 1em;
+}
+
+.ticketPage {
+  height: 95%;
+  padding: 3em 3em;
+  display: flex;
+  flex-direction: column;
+  margin: 0 auto;
+  max-width: 1280px;
+}
+
+.ticketHeader {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-bottom: 1em;
+  border-bottom: 1px solid#e1e4e8;
+}
+
+.ticketHeader > h1 > span {
+  color: grey;
+  font-weight: 500;
+}
+.ticketSubheader {
+  display: flex;
+  margin-top: 1em;
+  align-items: center;
+}
+
+.ticketSubheader > p {
+  margin-left: 0.5em;
+}
+
+.ticketStatus {
+  display: flex;
+  align-items: center;
+  border-radius: 2em;
+  padding: 0.5em 1em;
+  text-align: center;
+  color: white;
+}
+.open {
+  background-color: #28a745;
+}
+
+.closed {
+  background-color: #d73a49;
+}
+
+.ticketContent {
+  margin-top: 1em;
+  background-color: white;
+  border-radius: 10px;
+  border: 1px solid #e1e4e8;
+}
+.ticketContentHeader {
+  background-color: #f6f8fa;
+  padding: 2em;
+}
+.ticketContentMain {
+  padding: 2em;
+}
+
+.ticketContent textarea {
+  width: 100%;
+  resize: vertical;
+  height: 100%;
+  border-radius: 5px;
+  font-family: Lato;
+  padding: 1em;
+}
+
+.commentButton {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1em;
+}

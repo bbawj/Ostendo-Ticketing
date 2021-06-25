@@ -7,6 +7,8 @@ import Home from "./Home";
 import { createMuiTheme } from "@material-ui/core";
 import { ThemeProvider } from "@material-ui/styles";
 import Login from "./Login";
+import { UserProvider } from "../contexts/UserContext";
+import TicketPage from "./TicketPage";
 
 const THEME = createMuiTheme({
   typography: {
@@ -22,14 +24,17 @@ const THEME = createMuiTheme({
 export default function App() {
   return (
     <div className="App">
-      <ThemeProvider theme={THEME}>
-        <Router>
-          <Header />
-          <Route exact path="/" component={Login} />
-          <Route path="/signup" component={Signup} />
-          <Route path="/home" component={Home} />
-        </Router>
-      </ThemeProvider>
+      <UserProvider>
+        <ThemeProvider theme={THEME}>
+          <Router>
+            <Header />
+            <Route exact path="/" component={Login} />
+            <Route path="/signup" component={Signup} />
+            <Route path="/home" component={Home} />
+            <Route path="/ticket/:id" component={TicketPage} />
+          </Router>
+        </ThemeProvider>
+      </UserProvider>
     </div>
   );
 }

@@ -1,12 +1,15 @@
 .home {
   height: 95%;
-  padding-top: 3em;
-  padding-left: 3em;
+  padding: 3em 3em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .createTicket {
   display: flex;
   flex-direction: column;
+  width: 70%;
 }
 
 .ticketHeader {
@@ -16,7 +19,6 @@
 
 .createTicket > form {
   margin-top: 1em;
-  width: 70%;
 }
 
 .createTicket .MuiInputBase-root {
@@ -28,6 +30,9 @@
   color: white;
 }
 
+.myTickets {
+  width: 70%;
+}
 .myTickets > h2 {
   margin: 1em 0;
 }

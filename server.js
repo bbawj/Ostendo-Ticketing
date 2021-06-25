@@ -8,20 +8,39 @@ const passport = require("passport");
 const initializePassport = require("./passport-config");
 const flash = require("express-flash");
 const session = require("express-session");
+const MySQLStore = require("express-mysql-session")(session);
 const pool = require("./db");
 
 initializePassport(
   passport,
-  async (email) =>
-    await pool.query("SELECT * FROM users where email = ?", email),
-  async (id) => await pool.query("SELECT * FROM users where id = ?", id)
+  async (email) => {
+    return await pool.query("SELECT * FROM users where email = ?", email);
+  },
+  async (id) => {
+    return await pool.query("SELECT * FROM users where id = ?", id);
+  }
 );
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const sessionStore = new MySQLStore(
+  {
+    host: "localhost",
+    user: "root",
+    password: process.env.DB_SECRET,
+    database: "ostendoticketing",
+  },
+  pool
+);
 
 //middleware
-app.use(cors());
+app.use(
+  cors({
+    origin: "http://localhost:3000", // allow to server to accept request from different origin
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // allow session cookie from browser to pass through
+  })
+);
 app.use(express.json());
 app.use(flash());
 app.use(express.urlencoded({ extended: true }));
@@ -30,6 +49,7 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    store: sessionStore,
   })
 );
 app.use(passport.initialize());
@@ -37,7 +57,9 @@ app.use(passport.session());
 
 //routes
 const ticketRoute = require("./routes/ticket");
-app.use("/ticket", ticketRoute);
+const commentRoute = require("./routes/comment");
+app.use("/api/ticket", ticketRoute);
+app.use("/api/comment", commentRoute);
 
 app.post("/register", async (req, res) => {
   try {
@@ -60,6 +82,13 @@ app.post("/register", async (req, res) => {
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
   return res.status(200).json({ redirectUrl: "/home" });
+});
+
+app.get("/isauth", (req, res) => {
+  if (req.user) {
+    return res.status(200).json({ currentUser: req.user.id });
+  }
+  return res.status(401).json({ message: Unauthorized, redirectUrl: "/" });
 });
 
 app.listen(PORT, () => {

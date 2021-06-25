@@ -5,6 +5,7 @@ import * as Yup from "yup";
 import { TextField, Button } from "@material-ui/core";
 import axios from "../axios";
 import { useHistory } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 const MyTextField = ({ label, type, ...props }) => {
   const [field, meta] = useField(props);
@@ -25,9 +26,11 @@ const MyTextField = ({ label, type, ...props }) => {
 };
 export default function Login() {
   const history = useHistory();
+  const { setCurrentUser } = useUser();
+
   return (
     <div className="signup">
-      <h2>Create an account</h2>
+      <h2>Login</h2>
       <Formik
         initialValues={{ email: "", password: "", passwordConfirm: "" }}
         validationSchema={Yup.object({
@@ -38,9 +41,11 @@ export default function Login() {
         })}
         onSubmit={async (values, { setSubmitting }) => {
           setSubmitting(true);
-          const res = await axios.post("/login", values);
-          history.push(res.data.redirectUrl);
+          const res = await axios.post("/login", values, {
+            withCredentials: true,
+          });
           setSubmitting(false);
+          history.push(res.data.redirectUrl);
         }}
       >
         <Form>
