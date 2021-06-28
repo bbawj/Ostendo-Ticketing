@@ -85,6 +85,14 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
     req.body.status,
     req.params.ticketId,
   ]);
+  // add new comment for status update
+  const statusComment = {
+    type: "update",
+    owner_id: req.user.id,
+    ticket_id: req.params.ticketId,
+    text: req.body.status,
+  };
+  await pool.query("INSERT INTO comments SET ?", statusComment);
   return res
     .status(200)
     .json({ message: "Successfully updated ticket status" });

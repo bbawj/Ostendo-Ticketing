@@ -7,7 +7,7 @@ import Alert from "@material-ui/lab/Alert";
 
 export default function CreateTicket() {
   const [expanded, setExpanded] = useState(false);
-  const [info, setInfo] = useState({});
+  const [info, setInfo] = useState({ title: "", description: "" });
   const [open, setOpen] = useState(false);
   const [error, setError] = useState(false);
 

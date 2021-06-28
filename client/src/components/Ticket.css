@@ -57,15 +57,16 @@
   color: white;
 }
 .open {
-  background-color: #28a745;
+  background-color: var(--success);
 }
 
 .closed {
-  background-color: #d73a49;
+  background-color: var(--error);
 }
 
 .ticketContent {
   padding-bottom: 1em;
+  padding-top: 1em;
   position: relative;
   margin-left: 1em;
 }
@@ -114,4 +115,9 @@
   display: flex;
   justify-content: flex-end;
   margin-top: 1em;
+}
+
+.updateContainer {
+  display: flex;
+  align-items: center;
 }

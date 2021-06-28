@@ -14,7 +14,6 @@ export default function TicketPage() {
   const [response, setResponse] = useState("");
   const [comments, setComments] = useState([]);
   const { currentUser } = useUser();
-  console.log(ticket);
 
   async function handleSubmitComment(e) {
     try {
@@ -28,6 +27,7 @@ export default function TicketPage() {
         },
         { withCredentials: true }
       );
+      console.log("hello");
       setResponse("");
       setComments((prev) => [...prev, res.data]);
     } catch (err) {
@@ -45,12 +45,14 @@ export default function TicketPage() {
         { withCredentials: true }
       );
       setTicket((prev) => ({ ...prev, status: status }));
+      setResponse("");
     } catch (err) {
       console.error(err);
     }
   }
 
   useEffect(() => {
+    console.log("render");
     async function getTicketData() {
       const res = await axios.get(`/api/ticket/${state.ticketId}`, {
         withCredentials: true,
@@ -58,7 +60,10 @@ export default function TicketPage() {
       setTicket({
         ...res.data.ticketData,
         username: res.data.ticketData.email.split("@")[0],
-        date: new Date(res.data.ticketData.created_date).toDateString(),
+        date: new Date(res.data.ticketData.created_date).toLocaleDateString(
+          "en-SG",
+          { year: "numeric", month: "short", day: "numeric" }
+        ),
       });
       setComments(res.data.commentData);
     }
@@ -76,7 +81,9 @@ export default function TicketPage() {
             return handleChangeIssueStatus("closed");
           }}
           variant="outlined"
-          startIcon={<CheckCircleOutlineIcon style={{ color: "#d73a49" }} />}
+          startIcon={
+            <CheckCircleOutlineIcon style={{ color: "var(--error)" }} />
+          }
         >
           Close Issue
         </Button>
@@ -87,7 +94,7 @@ export default function TicketPage() {
         <Button
           onClick={() => handleChangeIssueStatus("open")}
           variant="outlined"
-          startIcon={<ErrorOutlineIcon style={{ color: "#28a745" }} />}
+          startIcon={<ErrorOutlineIcon style={{ color: "var(--success)" }} />}
         >
           Re-open Issue
         </Button>
@@ -132,28 +139,88 @@ export default function TicketPage() {
         </div>
       </div>
       {!(comments.length === 0) &&
-        comments.map((comment, idx) => (
-          <div
-            className={`ticketContent ${
-              idx === comments.length - 1 && "last"
-            } `}
-            key={comment.id}
-          >
-            <div className="ticketContainer">
-              <div className="ticketContentHeader">
-                <p>
-                  <span style={{ fontWeight: "bold" }}>
-                    {comment.email.split("@")[0]}
-                  </span>{" "}
-                  commented on {new Date(comment.created_date).toDateString()}
-                </p>
+        comments.map((comment, idx) => {
+          if (comment.type === "comment") {
+            return (
+              <div
+                className={`ticketContent ${
+                  idx === comments.length - 1 && "last"
+                } `}
+                key={comment.id}
+              >
+                <div className="ticketContainer">
+                  <div className="ticketContentHeader">
+                    <p>
+                      <span style={{ fontWeight: "bold" }}>
+                        {comment.email.split("@")[0]}
+                      </span>{" "}
+                      commented on{" "}
+                      {new Date(comment.created_date).toLocaleDateString(
+                        "en-SG",
+                        {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        }
+                      )}
+                    </p>
+                  </div>
+                  <div className="ticketContentMain">
+                    <p>{comment.text}</p>
+                  </div>
+                </div>
               </div>
-              <div className="ticketContentMain">
-                <p>{comment.text}</p>
+            );
+          } else if (comment.type === "update" && comment.text === "open") {
+            return (
+              <div
+                className={`ticketContent ${
+                  idx === comments.length - 1 && "last"
+                } `}
+                key={comment.id}
+              >
+                <div className="updateContainer" key={comment.id}>
+                  <ErrorOutlineIcon
+                    style={{ color: "var(--success)", marginRight: "1em" }}
+                  />
+                  <span>{`${
+                    comment.email.split("@")[0]
+                  } has re-opened the issue on ${new Date(
+                    comment.created_date
+                  ).toLocaleDateString("en-SG", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}`}</span>
+                </div>
               </div>
-            </div>
-          </div>
-        ))}
+            );
+          } else {
+            return (
+              <div
+                className={`ticketContent ${
+                  idx === comments.length - 1 && "last"
+                } `}
+                key={comment.id}
+              >
+                <div className="updateContainer" key={comment.id}>
+                  <CheckCircleOutlineIcon
+                    style={{ color: "var(--error)", marginRight: "1em" }}
+                  />
+                  <span>{`${
+                    comment.email.split("@")[0]
+                  } closed the issue on ${new Date(
+                    comment.created_date
+                  ).toLocaleDateString("en-SG", {
+                    year: "numeric",
+                    month: "short",
+                    day: "numeric",
+                  })}`}</span>
+                </div>
+              </div>
+            );
+          }
+        })}
       <div className="ticketContent" style={{ marginTop: "1em" }}>
         <div className="ticketContentHeader">
           <h3>Respond</h3>
@@ -161,6 +228,7 @@ export default function TicketPage() {
         <div className="ticketContentMain">
           <form onSubmit={handleSubmitComment}>
             <TextareaAutosize
+              value={response}
               onChange={(e) => setResponse(e.target.value)}
               placeholder="Leave a comment"
             />
@@ -168,7 +236,7 @@ export default function TicketPage() {
               <Button
                 type="submit"
                 disabled={!!!response}
-                style={{ backgroundColor: "#28a745", color: "white" }}
+                style={{ backgroundColor: "var(--success)", color: "white" }}
               >
                 Comment
               </Button>

@@ -6,6 +6,8 @@
 :root {
   --theme: #337ab7;
   --accent: #f6f8fa;
+  --success: #28a745;
+  --error: #d73a49;
 }
 
 a {

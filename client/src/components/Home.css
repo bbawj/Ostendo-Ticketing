@@ -5,10 +5,15 @@
   align-items: center;
 }
 
+.home > div {
+  width: 70%;
+  height: 100%;
+}
+
 .createTicket {
   display: flex;
   flex-direction: column;
-  width: 70%;
+  width: 100%;
 }
 
 .ticketCreateHeader {
@@ -17,6 +22,10 @@
 }
 .ticketCreateHeader > h2 {
   margin-right: 0.5em;
+}
+
+.ticketCreateHeader > .MuiSvgIcon-root {
+  color: var(--theme);
 }
 
 .createTicket > form {
@@ -33,7 +42,7 @@
 }
 
 .myTickets {
-  width: 70%;
+  width: 100%;
 }
 .myTickets > h2 {
   margin: 1em 0;

@@ -23,14 +23,13 @@ router.post("/", isAuth, async (req, res) => {
       text: req.body.text,
     };
     const result = await pool.query("INSERT INTO comments SET ?", comment);
-    return res
-      .status(200)
-      .json({
-        ...comment,
-        id: result.insertId,
-        email: req.user.email,
-        created_date: Date.now(),
-      });
+    return res.status(200).json({
+      ...comment,
+      type: "comment",
+      id: result.insertId,
+      email: req.user.email,
+      created_date: Date.now(),
+    });
   } catch (err) {
     return res.status(500).json({ message: err });
   }

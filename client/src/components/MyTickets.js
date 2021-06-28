@@ -10,7 +10,7 @@ export default function MyTickets() {
   const [value, setValue] = useState(0);
   const [openTickets, setOpenTickets] = useState([]);
   const [closedTickets, setClosedTickets] = useState([]);
-  console.log(openTickets);
+  //console.log(openTickets);
   useEffect(() => {
     async function getMyTickets() {
       try {
