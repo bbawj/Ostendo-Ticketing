@@ -72,7 +72,11 @@ app.post("/register", async (req, res) => {
       return res.status(404).send({ message: "User already registered" });
     //create user
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
-    const newUser = { email: req.body.email, password: hashedPassword };
+    const newUser = {
+      email: req.body.email,
+      password: hashedPassword,
+      company: req.body.company,
+    };
     await pool.query("INSERT INTO users SET ?", newUser);
     return res.status(200).json({ redirectUrl: "/home" });
   } catch (err) {
@@ -86,7 +90,7 @@ app.post("/login", passport.authenticate("local"), (req, res) => {
 
 app.get("/isauth", (req, res) => {
   if (req.user) {
-    return res.status(200).json({ currentUser: req.user.id });
+    return res.status(200).json({ id: req.user.id, role: req.user.admin });
   }
   return res.status(401).json({ message: Unauthorized, redirectUrl: "/" });
 });

@@ -1,5 +1,4 @@
 .home {
-  height: 95%;
   padding: 3em 3em;
   display: flex;
   flex-direction: column;
@@ -12,9 +11,12 @@
   width: 70%;
 }
 
-.ticketHeader {
+.ticketCreateHeader {
   display: flex;
   align-items: flex-end;
+}
+.ticketCreateHeader > h2 {
+  margin-right: 0.5em;
 }
 
 .createTicket > form {

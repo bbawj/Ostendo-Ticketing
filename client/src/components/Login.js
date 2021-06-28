@@ -4,7 +4,7 @@ import { Formik, Field, Form, useField } from "formik";
 import * as Yup from "yup";
 import { TextField, Button } from "@material-ui/core";
 import axios from "../axios";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
 const MyTextField = ({ label, type, ...props }) => {
@@ -62,7 +62,9 @@ export default function Login() {
           </Button>
         </Form>
       </Formik>
-      <p>Don't have an account? Sign up.</p>
+      <p>
+        Don't have an account? <Link to="/signup">Sign up.</Link>
+      </p>
     </div>
   );
 }

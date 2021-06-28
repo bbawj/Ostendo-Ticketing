@@ -14,6 +14,7 @@ export default function TicketPage() {
   const [response, setResponse] = useState("");
   const [comments, setComments] = useState([]);
   const { currentUser } = useUser();
+  console.log(ticket);
 
   async function handleSubmitComment(e) {
     try {
@@ -21,13 +22,29 @@ export default function TicketPage() {
       const res = await axios.post(
         "/api/comment",
         {
-          currentUser: currentUser,
+          currentUser: currentUser.id,
           ticket_id: ticket.id,
           text: response,
         },
         { withCredentials: true }
       );
-      setComments((prev) => [...prev, res]);
+      setResponse("");
+      setComments((prev) => [...prev, res.data]);
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function handleChangeIssueStatus(status) {
+    try {
+      await axios.patch(
+        `/api/ticket/${ticket.id}`,
+        {
+          status: status,
+        },
+        { withCredentials: true }
+      );
+      setTicket((prev) => ({ ...prev, status: status }));
     } catch (err) {
       console.error(err);
     }
@@ -38,8 +55,6 @@ export default function TicketPage() {
       const res = await axios.get(`/api/ticket/${state.ticketId}`, {
         withCredentials: true,
       });
-      console.log(res);
-      //const commentRes = await axios.get(`/api/comment/${state.ticketId}`,{withCredentials:true})
       setTicket({
         ...res.data.ticketData,
         username: res.data.ticketData.email.split("@")[0],
@@ -49,6 +64,40 @@ export default function TicketPage() {
     }
     getTicketData();
   }, [state.ticketId]);
+
+  let issueButton;
+  switch (ticket.status) {
+    case "open":
+      issueButton = (
+        <Button
+          onClick={() => {
+            if (currentUser.role === "admin")
+              return handleChangeIssueStatus("closedbyadmin");
+            return handleChangeIssueStatus("closed");
+          }}
+          variant="outlined"
+          startIcon={<CheckCircleOutlineIcon style={{ color: "#d73a49" }} />}
+        >
+          Close Issue
+        </Button>
+      );
+      break;
+    case "closed":
+      issueButton = (
+        <Button
+          onClick={() => handleChangeIssueStatus("open")}
+          variant="outlined"
+          startIcon={<ErrorOutlineIcon style={{ color: "#28a745" }} />}
+        >
+          Re-open Issue
+        </Button>
+      );
+      break;
+    default:
+      issueButton = <span></span>;
+      break;
+  }
+
   return (
     <div className="ticketPage">
       <div className="ticketHeader">
@@ -66,35 +115,46 @@ export default function TicketPage() {
             </div>
           )}
           <p>{`${ticket.username} opened this issue on ${ticket.date}`}</p>
+          {issueButton}
         </div>
       </div>
       <div className="ticketContent">
-        <div className="ticketContentHeader">
-          <p>
-            <span style={{ fontWeight: "bold" }}>{ticket.username}</span>{" "}
-            commented on {ticket.date}
-          </p>
-        </div>
-        <div className="ticketContentMain">
-          <p>{ticket.description}</p>
-        </div>
-      </div>
-      {comments.map((comment) => (
-        <div className="ticketContent" key={comment.id}>
+        <div className="ticketContainer">
           <div className="ticketContentHeader">
             <p>
-              <span style={{ fontWeight: "bold" }}>
-                {comment.email.split("@")[0]}
-              </span>{" "}
-              commented on {new Date(comment.created_date).toDateString()}
+              <span style={{ fontWeight: "bold" }}>{ticket.username}</span>{" "}
+              commented on {ticket.date}
             </p>
           </div>
           <div className="ticketContentMain">
-            <p>{comment.text}</p>
+            <p>{ticket.description}</p>
           </div>
         </div>
-      ))}
-      <div className="ticketContent">
+      </div>
+      {!(comments.length === 0) &&
+        comments.map((comment, idx) => (
+          <div
+            className={`ticketContent ${
+              idx === comments.length - 1 && "last"
+            } `}
+            key={comment.id}
+          >
+            <div className="ticketContainer">
+              <div className="ticketContentHeader">
+                <p>
+                  <span style={{ fontWeight: "bold" }}>
+                    {comment.email.split("@")[0]}
+                  </span>{" "}
+                  commented on {new Date(comment.created_date).toDateString()}
+                </p>
+              </div>
+              <div className="ticketContentMain">
+                <p>{comment.text}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      <div className="ticketContent" style={{ marginTop: "1em" }}>
         <div className="ticketContentHeader">
           <h3>Respond</h3>
         </div>

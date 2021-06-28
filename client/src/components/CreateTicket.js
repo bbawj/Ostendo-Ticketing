@@ -58,7 +58,7 @@ export default function CreateTicket() {
           There was an error processing your request.
         </Alert>
       </Snackbar>
-      <div className="ticketHeader">
+      <div className="ticketCreateHeader">
         <h2>Create a ticket</h2>
         <ConfirmationNumberIcon />
       </div>

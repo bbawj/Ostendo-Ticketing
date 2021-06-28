@@ -8,6 +8,10 @@ const schema = Joi.object({
   description: Joi.string().required(),
 });
 
+const statusSchema = Joi.object({
+  status: Joi.string().valid("open", "closed"),
+});
+
 //get all tickets only for admin
 router.get("/", (req, res) => {});
 
@@ -52,7 +56,7 @@ router.get("/:ticketId", isAuth, async (req, res) => {
   }
   try {
     const [ticketData] = await pool.query(
-      "SELECT tickets.*, users.email FROM tickets JOIN users ON tickets.id=users.id WHERE tickets.id = ? AND owner_id = ? LIMIT 1",
+      "SELECT tickets.*, users.email FROM tickets JOIN users ON tickets.owner_id=users.id WHERE tickets.id = ? AND owner_id = ? LIMIT 1",
       [req.params.ticketId, req.user.id]
     );
     const [commentData] = await pool.query(
@@ -65,8 +69,26 @@ router.get("/:ticketId", isAuth, async (req, res) => {
   }
 });
 
-//PATCH ticket state only for admin
-router.patch("/:ticketId");
+//PATCH ticket state only for admin/owner
+router.patch("/:ticketId", isAuth, async (req, res) => {
+  // validate with status schema
+  const { error } = statusSchema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+  //check if ticket exists
+  const [rows] = await pool.query(
+    "SELECT * FROM tickets WHERE id = ? LIMIT 1",
+    req.params.ticketId
+  );
+  if (rows.length === 0)
+    return res.status(404).json({ message: "Ticket not found" });
+  await pool.query("UPDATE tickets SET status = ? WHERE id = ?", [
+    req.body.status,
+    req.params.ticketId,
+  ]);
+  return res
+    .status(200)
+    .json({ message: "Successfully updated ticket status" });
+});
 
 //DELETE ticket
 

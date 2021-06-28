@@ -1,14 +1,23 @@
 .ticket {
   margin-top: 1em;
+  background-color: white;
+  padding: 1em;
+  border-radius: 5px;
+  border: 2px solid var(--accent);
 }
 
 .ticketPage {
-  height: 95%;
   padding: 3em 3em;
   display: flex;
   flex-direction: column;
   margin: 0 auto;
-  max-width: 1280px;
+  max-width: 900px;
+}
+
+.MuiTabs-root {
+  background-color: var(--accent);
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 
 .ticketHeader {
@@ -17,6 +26,7 @@
   align-items: flex-start;
   padding-bottom: 1em;
   border-bottom: 1px solid#e1e4e8;
+  margin-bottom: 1em;
 }
 
 .ticketHeader > h1 > span {
@@ -27,10 +37,15 @@
   display: flex;
   margin-top: 1em;
   align-items: center;
+  width: 100%;
 }
 
 .ticketSubheader > p {
   margin-left: 0.5em;
+}
+
+.ticketSubheader > .MuiButton-root {
+  margin-left: auto;
 }
 
 .ticketStatus {
@@ -50,17 +65,40 @@
 }
 
 .ticketContent {
-  margin-top: 1em;
-  background-color: white;
-  border-radius: 10px;
-  border: 1px solid #e1e4e8;
+  padding-bottom: 1em;
+  position: relative;
+  margin-left: 1em;
+}
+.last {
+  border-bottom: 3px solid #e1e4e8;
+}
+.ticketContainer {
+  margin-left: -1em;
+}
+
+.ticketContainer:before {
+  display: block;
+  content: "";
+  background-color: #e1e4e8;
+  width: 2px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
 }
 .ticketContentHeader {
   background-color: #f6f8fa;
-  padding: 2em;
+  border: 1px solid #e1e4e8;
+  position: relative;
+  padding: 1em 0 1em 2em;
+  border-radius: 10px 10px 0 0;
 }
 .ticketContentMain {
   padding: 2em;
+  background-color: white;
+  position: relative;
+  border: 1px solid #e1e4e8;
+  border-radius: 0 0 10px 10px;
 }
 
 .ticketContent textarea {

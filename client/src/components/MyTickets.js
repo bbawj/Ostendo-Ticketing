@@ -43,6 +43,7 @@ export default function MyTickets() {
         {!(openTickets.length === 0) ? (
           openTickets.map((ticket) => (
             <Link
+              key={ticket.id}
               to={{
                 pathname: `/ticket/${ticket.id}`,
                 state: { ticketId: ticket.id },
@@ -61,7 +62,26 @@ export default function MyTickets() {
         )}
       </div>
       <div value={value} hidden={value !== 1}>
-        <h3>No closed tickets</h3>
+        {!(closedTickets.length === 0) ? (
+          closedTickets.map((ticket) => (
+            <Link
+              key={ticket.id}
+              to={{
+                pathname: `/ticket/${ticket.id}`,
+                state: { ticketId: ticket.id },
+              }}
+            >
+              <div className="ticket">
+                <h3>{ticket.title}</h3>
+                <p>{`#${ticket.id} opened ${formatTimeAgo(
+                  ticket.created_date
+                )} by ${ticket.email}`}</p>
+              </div>
+            </Link>
+          ))
+        ) : (
+          <h3>No closed tickets</h3>
+        )}
       </div>
     </div>
   );

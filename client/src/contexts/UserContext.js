@@ -19,7 +19,8 @@ export function UserProvider({ children }) {
       if (res.data.redirectUrl) {
         history.push("/");
       } else {
-        setCurrentUser(res.data.currentUser);
+        console.log(res);
+        setCurrentUser({ id: res.data.id, role: res.data.role });
       }
     }
     getUser();

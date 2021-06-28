@@ -4,12 +4,12 @@
   justify-content: center;
   align-items: center;
   margin: 3em auto 0 auto;
-  padding: 1em;
+  padding: 2em 1em 2em 1em;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 70%;
+  height: 70vh;
   max-width: 600px;
-  height: 70%;
 }
 
 .signup > h2 {
@@ -18,14 +18,35 @@
 
 .formFields {
   margin: 1em;
+  width: 100%;
 }
 
 .signup form {
+  display: flex;
+  flex-direction: column;
   text-align: center;
-  width: 50%;
+  justify-content: center;
+  align-items: center;
 }
 
 .signup .MuiButton-root {
   background-color: var(--theme);
   color: white;
+}
+
+.signup a:link,
+.signup a:visited {
+  color: var(--theme);
+}
+
+.formFlex {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+@media (max-width: 600px) {
+  .signup {
+    width: 100%;
+  }
 }
