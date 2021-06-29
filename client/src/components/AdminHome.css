@@ -32,3 +32,12 @@ div.searchField {
   color: grey;
   font-weight: 500;
 }
+.tabsPanel {
+  display: flex;
+}
+.tabsPanel > .MuiTabs-root {
+  flex: 1;
+}
+.tabsPanel > .MuiButton-root {
+  background-color: var(--accent);
+}

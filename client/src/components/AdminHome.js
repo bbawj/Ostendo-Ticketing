@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import { Formik, Field, Form, useField } from "formik";
 import {
+  Button,
   IconButton,
   TextField,
   Select,
@@ -10,6 +11,8 @@ import {
   FormControl,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
+import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
+import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import { Link } from "react-router-dom";
 import axios from "../axios";
 import { formatTimeAgo } from "./FormatTime";
@@ -32,6 +35,38 @@ export default function AdminHome() {
   const [value, setValue] = useState(0);
   const [openTickets, setOpenTickets] = useState([]);
   const [closedTickets, setClosedTickets] = useState([]);
+  const [sort, setSort] = useState(1);
+
+  function handleSort() {
+    if (sort) {
+      setOpenTickets((prev) =>
+        prev.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+      );
+      setClosedTickets((prev) =>
+        prev.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
+      );
+      setSort((prev) => !prev);
+    } else {
+      setOpenTickets((prev) =>
+        prev.sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
+      );
+      setClosedTickets((prev) =>
+        prev.sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
+      );
+      setSort((prev) => !prev);
+    }
+  }
+
+  useEffect(() => {
+    async function getTickets() {
+      const res = await axios.get("/api/ticket/admin", {
+        withCredentials: true,
+      });
+      setOpenTickets(res.data.filter((ticket) => ticket.status === "open"));
+      setClosedTickets(res.data.filter((ticket) => ticket.status === "closed"));
+    }
+    getTickets();
+  }, []);
 
   return (
     <div className="adminHome">
@@ -40,17 +75,22 @@ export default function AdminHome() {
         <Formik
           initialValues={{ text: "", company: "", start: "", end: "" }}
           onSubmit={async (values, { setSubmitting }) => {
-            // search database
-            setSubmitting(true);
-            const res = await axios.post("/api/ticket/admin", values, {
-              withCredentials: true,
-            });
-            setOpenTickets(
-              res.data.filter((ticket) => ticket.status === "open")
-            );
-            setClosedTickets(
-              res.data.filter((ticket) => ticket.status === "closed")
-            );
+            try {
+              // search database
+              setSubmitting(true);
+              const res = await axios.post("/api/ticket/admin", values, {
+                withCredentials: true,
+              });
+              setOpenTickets(
+                res.data.filter((ticket) => ticket.status === "open")
+              );
+              setClosedTickets(
+                res.data.filter((ticket) => ticket.status === "closed")
+              );
+            } catch (err) {
+              // console.log(err.response.data);
+              console.error(err);
+            }
           }}
         >
           <Form>
@@ -84,16 +124,24 @@ export default function AdminHome() {
           </Form>
         </Formik>
       </div>
-      <Tabs
-        indicatorColor="primary"
-        value={value}
-        onChange={(event, newValue) => {
-          setValue(newValue);
-        }}
-      >
-        <Tab label="Open" />
-        <Tab label="Closed" />
-      </Tabs>
+      <div className="tabsPanel">
+        <Tabs
+          indicatorColor="primary"
+          value={value}
+          onChange={(event, newValue) => {
+            setValue(newValue);
+          }}
+        >
+          <Tab label="Open" />
+          <Tab label="Closed" />
+        </Tabs>
+        <Button
+          onClick={handleSort}
+          endIcon={sort ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+        >
+          Sort By
+        </Button>
+      </div>
       <div className="ticketTable" value={value} hidden={value !== 0}>
         {!(openTickets.length === 0) ? (
           openTickets.map((ticket) => (

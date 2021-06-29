@@ -12,8 +12,18 @@ const statusSchema = Joi.object({
   status: Joi.string().valid("open", "closed"),
 });
 
+const filterSchema = Joi.object({
+  text: Joi.string().allow(""),
+  start: Joi.string().allow(""),
+  end: Joi.string().allow(""),
+  company: Joi.string().allow(""),
+});
+
 //post filter values from form to get ticket values
 router.post("/admin", isAdmin, async (req, res) => {
+  //Joi validation
+  const { error } = filterSchema.validate(req.body);
+  if (error) return res.status(400).json(error.details[0].message);
   try {
     let queryString =
       "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id = u.id WHERE";
@@ -37,11 +47,13 @@ router.post("/admin", isAdmin, async (req, res) => {
       queryString = queryString + " u.company = ?";
       queryArr.push(req.body.company);
     }
+    //remove trailing "AND" or "WHERE"
     if (queryString.slice(-3) === "AND") {
       queryString = queryString.slice(0, -3);
     } else if (queryString.slice(-5) === "WHERE") {
       queryString = queryString.slice(0, -5);
     }
+    // use queryArr as second arguement if non-null
     if (queryArr.length === 0) {
       const [rows] = await pool.query(
         "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id=u.id"
@@ -51,6 +63,17 @@ router.post("/admin", isAdmin, async (req, res) => {
       const [rows] = await pool.query(queryString, queryArr);
       return res.status(200).json(rows);
     }
+  } catch (err) {
+    return res.status(500).json({ message: err });
+  }
+});
+
+router.get("/admin", isAdmin, async (req, res) => {
+  try {
+    const [rows] = await pool.query(
+      "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id=u.id"
+    );
+    return res.status(200).json(rows);
   } catch (err) {
     return res.status(500).json({ message: err });
   }
