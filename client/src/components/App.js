@@ -24,17 +24,18 @@ const THEME = createMuiTheme({
 export default function App() {
   return (
     <div className="App">
-      <UserProvider>
-        <ThemeProvider theme={THEME}>
-          <Router>
+      <ThemeProvider theme={THEME}>
+        <Router>
+          <UserProvider>
             <Header />
             <Route exact path="/" component={Login} />
+            <Route exact path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
             <Route path="/home" component={Home} />
             <Route path="/ticket/:id" component={TicketPage} />
-          </Router>
-        </ThemeProvider>
-      </UserProvider>
+          </UserProvider>
+        </Router>
+      </ThemeProvider>
     </div>
   );
 }

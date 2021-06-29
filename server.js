@@ -58,6 +58,7 @@ app.use(passport.session());
 //routes
 const ticketRoute = require("./routes/ticket");
 const commentRoute = require("./routes/comment");
+const { isAuth } = require("./authMiddleware");
 app.use("/api/ticket", ticketRoute);
 app.use("/api/comment", commentRoute);
 
@@ -85,14 +86,18 @@ app.post("/register", async (req, res) => {
 });
 
 app.post("/login", passport.authenticate("local"), (req, res) => {
-  return res.status(200).json({ redirectUrl: "/home" });
+  return res
+    .status(200)
+    .json({ id: req.user.id, role: req.user.role, redirectUrl: "/home" });
 });
 
-app.get("/isauth", (req, res) => {
+app.get("/isauth", isAuth, (req, res) => {
   if (req.user) {
-    return res.status(200).json({ id: req.user.id, role: req.user.admin });
+    return res.status(200).json({ id: req.user.id, role: req.user.role });
   }
-  return res.status(401).json({ message: Unauthorized, redirectUrl: "/" });
+  return res
+    .status(401)
+    .json({ message: "Unauthorized", redirectUrl: "/login" });
 });
 
 app.listen(PORT, () => {

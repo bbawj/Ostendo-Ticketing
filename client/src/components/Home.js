@@ -9,10 +9,10 @@ export default function Home() {
   const { currentUser } = useUser();
   return (
     <div className="home">
-      {currentUser.role === "admin" ? (
+      {currentUser && currentUser.role === "admin" ? (
         <AdminHome />
       ) : (
-        <div>
+        <div className="userHome">
           <CreateTicket />
           <MyTickets />
         </div>

@@ -1,0 +1,34 @@
+.adminHome {
+  width: 100%;
+}
+
+.searchContainer {
+  display: flex;
+  align-items: center;
+  margin-top: 1em;
+}
+
+.searchContainer > form {
+  display: flex;
+  width: 100%;
+  align-items: center;
+}
+
+.searchField > .MuiInput-root {
+  width: 100%;
+}
+
+div.searchField {
+  width: 30%;
+  margin: 1em;
+}
+
+.searchContainer .MuiSvgIcon-root {
+  color: var(--theme);
+}
+
+.ticketTable > h3 {
+  margin-top: 1em;
+  color: grey;
+  font-weight: 500;
+}

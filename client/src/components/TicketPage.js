@@ -52,20 +52,23 @@ export default function TicketPage() {
   }
 
   useEffect(() => {
-    console.log("render");
     async function getTicketData() {
-      const res = await axios.get(`/api/ticket/${state.ticketId}`, {
-        withCredentials: true,
-      });
-      setTicket({
-        ...res.data.ticketData,
-        username: res.data.ticketData.email.split("@")[0],
-        date: new Date(res.data.ticketData.created_date).toLocaleDateString(
-          "en-SG",
-          { year: "numeric", month: "short", day: "numeric" }
-        ),
-      });
-      setComments(res.data.commentData);
+      try {
+        const res = await axios.get(`/api/ticket/${state.ticketId}`, {
+          withCredentials: true,
+        });
+        setTicket({
+          ...res.data.ticketData,
+          username: res.data.ticketData.email.split("@")[0],
+          date: new Date(res.data.ticketData.created_date).toLocaleDateString(
+            "en-SG",
+            { year: "numeric", month: "short", day: "numeric" }
+          ),
+        });
+        setComments(res.data.commentData);
+      } catch (err) {
+        console.error(err);
+      }
     }
     getTicketData();
   }, [state.ticketId]);

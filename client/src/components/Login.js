@@ -45,6 +45,7 @@ export default function Login() {
             withCredentials: true,
           });
           setSubmitting(false);
+          setCurrentUser({ id: res.data.id, role: res.data.role });
           history.push(res.data.redirectUrl);
         }}
       >

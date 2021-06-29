@@ -15,16 +15,15 @@ export function UserProvider({ children }) {
 
   useEffect(() => {
     async function getUser() {
-      const res = await axios.get("/isauth", { withCredentials: true });
-      if (res.data.redirectUrl) {
-        history.push("/");
-      } else {
-        console.log(res);
+      try {
+        const res = await axios.get("/isauth", { withCredentials: true });
         setCurrentUser({ id: res.data.id, role: res.data.role });
+      } catch (err) {
+        history.push(err.response.data.redirectUrl);
       }
     }
     getUser();
-  }, []);
+  }, [history]);
 
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
 }

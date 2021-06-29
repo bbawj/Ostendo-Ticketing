@@ -12,18 +12,25 @@ export default function MyTickets() {
   const [closedTickets, setClosedTickets] = useState([]);
   //console.log(openTickets);
   useEffect(() => {
+    let isMounted = true;
     async function getMyTickets() {
       try {
         const res = await axios.get(`/api/ticket/user`, {
           withCredentials: true,
         });
-        setOpenTickets(res.data.filter((el) => el.status === "open"));
-        setClosedTickets(res.data.filter((el) => el.status === "closed"));
+        // set state only if mounted
+        if (isMounted) {
+          setOpenTickets(res.data.filter((el) => el.status === "open"));
+          setClosedTickets(res.data.filter((el) => el.status === "closed"));
+        }
       } catch (err) {
         console.error(err);
       }
     }
     getMyTickets();
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   return (
