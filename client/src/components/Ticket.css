@@ -7,11 +7,19 @@
 }
 
 .ticketPage {
-  padding: 3em 3em;
+  margin: 1em auto;
+  max-width: 1200px;
+}
+
+.ticketMain {
+  display: flex;
+  width: 100%;
+}
+
+.ticketContentColumn {
   display: flex;
   flex-direction: column;
-  margin: 0 auto;
-  max-width: 900px;
+  flex: 0.8;
 }
 
 .MuiTabs-root {

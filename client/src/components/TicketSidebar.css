@@ -1,0 +1,40 @@
+.ticketSidebar {
+  flex: 0.2;
+}
+
+.sidebarBox {
+  margin: 1em 1em;
+  border-bottom: 1px solid var(--accent2);
+}
+
+.sidebarBoxHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.sidebarBoxHeader > h3 {
+  font-weight: 500;
+  color: grey;
+}
+
+.dropdownMenu {
+  width: 150px;
+  top: 20px;
+  background-color: white;
+  position: absolute;
+  border: 1px solid var(--accent);
+}
+
+.sidebarBoxContent {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.label {
+  padding: 0.25em 0.5em;
+  background-color: var(--theme);
+  margin: 0.5em 1em 0.5em 0;
+  border-radius: 2em;
+}

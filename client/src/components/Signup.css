@@ -1,8 +1,6 @@
 .signup {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   margin: 3em auto 0 auto;
   padding: 2em 1em 2em 1em;
   background-color: white;
@@ -13,7 +11,13 @@
 }
 
 .signup > h2 {
+  padding-bottom: 0.5em;
+  font-size: 3rem;
+  padding-left: 0.25em;
+}
+.signup > p {
   padding-bottom: 1em;
+  padding-left: 1em;
 }
 
 .formFields {
@@ -26,12 +30,12 @@
   flex-direction: column;
   text-align: center;
   justify-content: center;
-  align-items: center;
 }
 
 .signup .MuiButton-root {
   background-color: var(--theme);
   color: white;
+  margin: 2em 1em 2em 1em;
 }
 
 .signup a:link,

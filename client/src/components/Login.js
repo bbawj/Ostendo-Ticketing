@@ -31,6 +31,7 @@ export default function Login() {
   return (
     <div className="signup">
       <h2>Login</h2>
+      <p>Sign in to your account</p>
       <Formik
         initialValues={{ email: "", password: "", passwordConfirm: "" }}
         validationSchema={Yup.object({
@@ -50,13 +51,17 @@ export default function Login() {
         }}
       >
         <Form>
-          <Field name="email" type="email" as={MyTextField} label="Email" />
-          <Field
-            name="password"
-            type="password"
-            label="Password"
-            as={MyTextField}
-          />
+          <div className="formFlex">
+            <Field name="email" type="email" as={MyTextField} label="Email" />
+          </div>
+          <div className="formFlex">
+            <Field
+              name="password"
+              type="password"
+              label="Password"
+              as={MyTextField}
+            />
+          </div>
 
           <Button variant="contained" type="submit">
             Login

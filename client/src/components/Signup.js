@@ -3,6 +3,7 @@ import "./Signup.css";
 import { Formik, Field, Form, useField } from "formik";
 import * as Yup from "yup";
 import {
+  FormControl,
   TextField,
   Button,
   Select,
@@ -36,13 +37,14 @@ const MySelectField = ({ label, ...props }) => {
   const errorText = meta.error && meta.touched ? meta.error : "";
 
   return (
-    <div className="formFields">
+    <FormControl className="formFields">
       <InputLabel id={label}>{label}</InputLabel>
       <Select style={{ width: "100%" }} {...field} labelId={label}>
+        <MenuItem value="">Company</MenuItem>
         <MenuItem value="GMP Recruitment">GMP Recruitment</MenuItem>
       </Select>
       <FormHelperText error={!!errorText}>{errorText}</FormHelperText>
-    </div>
+    </FormControl>
   );
 };
 export default function Signup() {
@@ -50,7 +52,8 @@ export default function Signup() {
   const [error, setError] = useState();
   return (
     <div className="signup">
-      <h2>Create an account</h2>
+      <h2>Register</h2>
+      <p>Create an account</p>
       {error && <span style={{ color: "red" }}>{error}</span>}
       <Formik
         initialValues={{
@@ -112,7 +115,7 @@ export default function Signup() {
         </Form>
       </Formik>
       <p>
-        Have an account? <Link to="/">Login</Link>
+        Have an account? <Link to="/">Login.</Link>
       </p>
     </div>
   );
