@@ -28,7 +28,6 @@ export default function TicketPage() {
         },
         { withCredentials: true }
       );
-      console.log("hello");
       setResponse("");
       setComments((prev) => [...prev, res.data]);
     } catch (err) {
@@ -58,7 +57,7 @@ export default function TicketPage() {
         const res = await axios.get(`/api/ticket/${state.ticketId}`, {
           withCredentials: true,
         });
-        console.log(res);
+        // console.log(res);
         setTicket({
           ...res.data.ticketData,
           username: res.data.ticketData.email.split("@")[0],
@@ -186,7 +185,7 @@ export default function TicketPage() {
                     } `}
                     key={comment.id}
                   >
-                    <div className="updateContainer" key={comment.id}>
+                    <div className="updateContainer">
                       <ErrorOutlineIcon
                         style={{ color: "var(--success)", marginRight: "1em" }}
                       />
@@ -210,7 +209,7 @@ export default function TicketPage() {
                     } `}
                     key={comment.id}
                   >
-                    <div className="updateContainer" key={comment.id}>
+                    <div className="updateContainer">
                       <CheckCircleOutlineIcon
                         style={{ color: "var(--error)", marginRight: "1em" }}
                       />

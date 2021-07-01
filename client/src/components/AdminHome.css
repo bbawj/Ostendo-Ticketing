@@ -41,3 +41,15 @@ div.searchField {
 .tabsPanel > .MuiButton-root {
   background-color: var(--accent);
 }
+
+.listTicketHeader {
+  display: flex;
+  align-items: center;
+}
+.listTicketHeader > h3 {
+  margin-right: 1em;
+}
+
+.labelSelect {
+  background-color: var(--accent);
+}

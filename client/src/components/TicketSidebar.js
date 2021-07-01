@@ -1,8 +1,8 @@
-import { IconButton, Select, MenuItem } from "@material-ui/core";
 import React, { useEffect, useState } from "react";
 import "./TicketSidebar.css";
 import AddIcon from "@material-ui/icons/Add";
 import axios from "../axios";
+import LabelSelect from "./LabelSelect";
 
 const labelNames = [
   "Software",
@@ -18,7 +18,6 @@ const labelNames = [
 ];
 
 export default function TicketSidebar({ id, label }) {
-  const [open, setOpen] = useState(false);
   const [labels, setLabels] = useState([]);
 
   async function addLabel(e) {
@@ -40,7 +39,6 @@ export default function TicketSidebar({ id, label }) {
         // label was added
         const diff = e.target.value.filter((label) => !labels.includes(label));
         const labelId = labelNames.indexOf(diff[0]) + 1;
-        console.log(diff);
         await axios.patch(
           `/api/ticket/${id}`,
           {
@@ -66,25 +64,7 @@ export default function TicketSidebar({ id, label }) {
     <div className="ticketSidebar">
       <div className="sidebarBox">
         <div className="sidebarBoxHeader">
-          <h3>Labels</h3>
-          <IconButton onClick={() => setOpen(!open)}>
-            <AddIcon style={{ color: "var(--theme)" }} />
-          </IconButton>
-          <Select
-            style={{ visibility: "hidden", width: "0" }}
-            multiple
-            open={open}
-            value={labels}
-            onChange={addLabel}
-            onClose={() => setOpen(false)}
-            onOpen={() => setOpen(true)}
-          >
-            {labelNames.map((label) => (
-              <MenuItem key={label} value={label}>
-                {label}
-              </MenuItem>
-            ))}
-          </Select>
+          <LabelSelect labels={labels} addLabel={addLabel} Icon={AddIcon} />
         </div>
         <div className="sidebarBoxContent">
           {labels.length !== 0 &&

@@ -16,7 +16,9 @@ import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import { Link } from "react-router-dom";
 import axios from "../axios";
 import { formatTimeAgo } from "./FormatTime";
+import LabelSelect from "./LabelSelect";
 import "./AdminHome.css";
+import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 
 const MySelect = ({ ...props }) => {
   const [field] = useField(props);
@@ -36,6 +38,24 @@ export default function AdminHome() {
   const [openTickets, setOpenTickets] = useState([]);
   const [closedTickets, setClosedTickets] = useState([]);
   const [sort, setSort] = useState(1);
+  const [labels, setLabels] = useState([]);
+  const [labelledTickets, setLabelledTickets] = useState([]);
+  const [disable, setDisable] = useState(false);
+
+  function addLabel(e) {
+    setLabels(e.target.value);
+    setOpenTickets(
+      labelledTickets.filter((ticket) => {
+        if (e.target.value.length === 0) return true;
+        return e.target.value.some((label) => {
+          if (ticket.name && ticket.name.split(",").includes(label)) {
+            return true;
+          }
+          return false;
+        });
+      })
+    );
+  }
 
   function handleSort() {
     if (sort) {
@@ -62,6 +82,7 @@ export default function AdminHome() {
       const res = await axios.get("/api/ticket/admin", {
         withCredentials: true,
       });
+      setLabelledTickets(res.data);
       setOpenTickets(res.data.filter((ticket) => ticket.status === "open"));
       setClosedTickets(res.data.filter((ticket) => ticket.status === "closed"));
     }
@@ -78,6 +99,7 @@ export default function AdminHome() {
             try {
               // search database
               setSubmitting(true);
+              setDisable(true);
               const res = await axios.post("/api/ticket/admin", values, {
                 withCredentials: true,
               });
@@ -87,6 +109,9 @@ export default function AdminHome() {
               setClosedTickets(
                 res.data.filter((ticket) => ticket.status === "closed")
               );
+              setSort(1);
+              setDisable(false);
+              setSubmitting(false);
             } catch (err) {
               // console.log(err.response.data);
               console.error(err);
@@ -118,7 +143,7 @@ export default function AdminHome() {
               type="date"
             />
             <Field as={MySelect} name="company" />
-            <IconButton type="submit">
+            <IconButton type="submit" disabled={disable}>
               <SearchIcon />
             </IconButton>
           </Form>
@@ -135,6 +160,12 @@ export default function AdminHome() {
           <Tab label="Open" />
           <Tab label="Closed" />
         </Tabs>
+        <LabelSelect
+          className="labelSelect"
+          labels={labels}
+          Icon={ArrowDropDownIcon}
+          addLabel={addLabel}
+        />
         <Button
           onClick={handleSort}
           endIcon={sort ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
@@ -153,7 +184,15 @@ export default function AdminHome() {
               }}
             >
               <div className="ticket">
-                <h3>{ticket.title}</h3>
+                <span className="listTicketHeader">
+                  <h3>{ticket.title} </h3>
+                  {ticket.name &&
+                    ticket.name.split(",").map((label) => (
+                      <span key={label} className="label">
+                        {label}
+                      </span>
+                    ))}
+                </span>
                 <p>{`#${ticket.id} opened ${formatTimeAgo(
                   ticket.created_date
                 )} by ${ticket.email}`}</p>

@@ -28,7 +28,7 @@ router.post("/admin", isAdmin, async (req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   try {
     let queryString =
-      "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id = u.id WHERE";
+      "SELECT t.*, u.email GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
     let queryArr = [];
     //build the query string
     if (req.body.text) {
@@ -55,10 +55,12 @@ router.post("/admin", isAdmin, async (req, res) => {
     } else if (queryString.slice(-5) === "WHERE") {
       queryString = queryString.slice(0, -5);
     }
+    // add group by
+    queryString = queryString + " GROUP BY t.id";
     // use queryArr as second arguement if non-null
     if (queryArr.length === 0) {
       const [rows] = await pool.query(
-        "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id=u.id"
+        "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
       );
       return res.status(200).json(rows);
     } else {
@@ -73,7 +75,7 @@ router.post("/admin", isAdmin, async (req, res) => {
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email from tickets as t JOIN users as u on t.owner_id=u.id"
+      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
     );
     return res.status(200).json(rows);
   } catch (err) {
