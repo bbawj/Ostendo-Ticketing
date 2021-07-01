@@ -1,8 +1,9 @@
 .header {
   background-color: var(--theme);
-  display: block;
+  display: flex;
   height: 62px;
   width: 100%;
+  justify-content: space-between;
 }
 
 .headerLogo {
@@ -13,4 +14,14 @@
   margin-left: 2em;
   width: 20%;
   height: 100%;
+}
+
+.headerLogo > a {
+  display: block;
+  height: 100%;
+}
+
+.header > button {
+  margin-right: 3em;
+  color: white;
 }

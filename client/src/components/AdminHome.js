@@ -214,7 +214,15 @@ export default function AdminHome() {
               }}
             >
               <div className="ticket">
-                <h3>{ticket.title}</h3>
+                <span className="listTicketHeader">
+                  <h3>{ticket.title} </h3>
+                  {ticket.name &&
+                    ticket.name.split(",").map((label) => (
+                      <span key={label} className="label">
+                        {label}
+                      </span>
+                    ))}
+                </span>
                 <p>{`#${ticket.id} opened ${formatTimeAgo(
                   ticket.created_date
                 )} by ${ticket.email}`}</p>

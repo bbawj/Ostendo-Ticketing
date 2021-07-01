@@ -49,7 +49,11 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    unset: "destroy",
     store: sessionStore,
+    cookie: {
+      maxAge: 1000 * 60 * 60 * 24, //1 day
+    },
   })
 );
 app.use(passport.initialize());
@@ -98,6 +102,12 @@ app.get("/isauth", isAuth, (req, res) => {
   return res
     .status(401)
     .json({ message: "Unauthorized", redirectUrl: "/login" });
+});
+
+app.post("/logout", (req, res) => {
+  req.logout();
+  req.session.destroy();
+  res.json({ redirectUrl: "/login", message: "Logged out." });
 });
 
 app.listen(PORT, () => {
