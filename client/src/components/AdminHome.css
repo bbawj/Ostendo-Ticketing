@@ -34,6 +34,7 @@ div.searchField {
 }
 .tabsPanel {
   display: flex;
+  border: 1px solid var(--accent2);
 }
 .tabsPanel > .MuiTabs-root {
   flex: 1;

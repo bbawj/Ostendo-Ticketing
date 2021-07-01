@@ -15,7 +15,7 @@ export default function CreateTicket() {
     e.preventDefault();
     try {
       await axios.post("/api/ticket", info, { withCredentials: true });
-      setInfo({});
+      setInfo({ title: "", description: "" });
       setOpen(true);
     } catch (err) {
       console.error(err);

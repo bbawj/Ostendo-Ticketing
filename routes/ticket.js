@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const pool = require("../db");
+const pool = require("../config/db");
 const { isAuth, isAdmin } = require("../authMiddleware");
 const Joi = require("joi");
 
@@ -9,7 +9,7 @@ const schema = Joi.object({
 });
 
 const updateSchema = Joi.object({
-  status: Joi.string().valid("open", "closed"),
+  status: Joi.string().valid("open", "closed", "closedbyadmin"),
   label: Joi.number().integer(),
   method: Joi.string().valid("add", "delete"),
 });
@@ -28,7 +28,7 @@ router.post("/admin", isAdmin, async (req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   try {
     let queryString =
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
+      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
     let queryArr = [];
     //build the query string
     if (req.body.text) {
@@ -60,7 +60,7 @@ router.post("/admin", isAdmin, async (req, res) => {
     // use queryArr as second arguement if non-null
     if (queryArr.length === 0) {
       const [rows] = await pool.query(
-        "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
+        "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
       );
       return res.status(200).json(rows);
     } else {
@@ -75,7 +75,7 @@ router.post("/admin", isAdmin, async (req, res) => {
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
+      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
     );
     return res.status(200).json(rows);
   } catch (err) {

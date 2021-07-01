@@ -25,6 +25,8 @@ export default function TicketPage() {
           currentUser: currentUser.id,
           ticket_id: ticket.id,
           text: response,
+          email: ticket.email,
+          title: ticket.title,
         },
         { withCredentials: true }
       );
@@ -103,6 +105,21 @@ export default function TicketPage() {
           Re-open Issue
         </Button>
       );
+      break;
+    case "closedbyadmin":
+      if (currentUser.role === "admin") {
+        issueButton = (
+          <Button
+            onClick={() => handleChangeIssueStatus("open")}
+            variant="outlined"
+            startIcon={<ErrorOutlineIcon style={{ color: "var(--success)" }} />}
+          >
+            Re-open Issue
+          </Button>
+        );
+      } else {
+        issueButton = <span></span>;
+      }
       break;
     default:
       issueButton = <span></span>;

@@ -7,7 +7,7 @@ function initialize(passport, getUserByEmail, getUserById) {
     //check if user exists
     const [results] = await getUserByEmail(email);
     //console.log(JSON.stringify(results[0]));
-    const user = JSON.parse(JSON.stringify(results[0]));
+    const user = results[0];
     if (user == null) {
       return done(null, false, { message: "No user with that email" });
     }
@@ -16,7 +16,7 @@ function initialize(passport, getUserByEmail, getUserById) {
       if (await bcrypt.compare(password, user.password)) {
         return done(null, user);
       } else {
-        return done(null, false, { message: "Pasword incorrect" });
+        return done(null, false, { message: "Password incorrect" });
       }
     } catch (e) {
       return done(e);

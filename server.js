@@ -5,11 +5,12 @@ const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
-const initializePassport = require("./passport-config");
+const initializePassport = require("./config/passport-config");
 const flash = require("express-flash");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
-const pool = require("./db");
+const pool = require("./config/db");
+const nodemailer = require("nodemailer");
 
 initializePassport(
   passport,
@@ -82,8 +83,12 @@ app.post("/register", async (req, res) => {
       password: hashedPassword,
       company: req.body.company,
     };
-    await pool.query("INSERT INTO users SET ?", newUser);
-    return res.status(200).json({ redirectUrl: "/home" });
+    const result = await pool.query("INSERT INTO users SET ?", newUser);
+    passport.authenticate("local")(req, res, () => {
+      return res
+        .status(200)
+        .json({ id: req.user.id, role: req.user.role, redirectUrl: "/home" });
+    });
   } catch (err) {
     return res.status(500).send({ error: err.message });
   }

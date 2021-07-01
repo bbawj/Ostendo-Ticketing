@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import axios from "../axios";
@@ -21,7 +23,11 @@ export default function MyTickets() {
         // set state only if mounted
         if (isMounted) {
           setOpenTickets(res.data.filter((el) => el.status === "open"));
-          setClosedTickets(res.data.filter((el) => el.status === "closed"));
+          setClosedTickets(
+            res.data.filter(
+              (el) => el.status === "closed" || el.status === "closedbyadmin"
+            )
+          );
         }
       } catch (err) {
         console.error(err);
@@ -43,8 +49,16 @@ export default function MyTickets() {
           setValue(newValue);
         }}
       >
-        <Tab label="Open" />
-        <Tab label="Closed" />
+        <Tab
+          label="Open"
+          style={{ color: "var(--success)" }}
+          icon={<ErrorOutlineIcon />}
+        />
+        <Tab
+          style={{ color: "var(--error)" }}
+          icon={<CheckCircleOutlineIcon />}
+          label="Closed"
+        />
       </Tabs>
       <div value={value} hidden={value !== 0}>
         {!(openTickets.length === 0) ? (

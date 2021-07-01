@@ -13,6 +13,7 @@ import {
 } from "@material-ui/core";
 import axios from "../axios";
 import { useHistory, Link } from "react-router-dom";
+import { useUser } from "../contexts/UserContext";
 
 const MyTextField = ({ label, type, ...props }) => {
   const [field, meta] = useField(props);
@@ -50,11 +51,15 @@ const MySelectField = ({ label, ...props }) => {
 export default function Signup() {
   const history = useHistory();
   const [error, setError] = useState();
+  const { setCurrentUser } = useUser();
+
   return (
     <div className="signup">
       <h2>Register</h2>
       <p>Create an account</p>
-      {error && <span style={{ color: "red" }}>{error}</span>}
+      {error && (
+        <span style={{ marginLeft: "1em", color: "red" }}>{error}</span>
+      )}
       <Formik
         initialValues={{
           email: "",
@@ -75,8 +80,12 @@ export default function Signup() {
         })}
         onSubmit={async (values, { setSubmitting }) => {
           try {
+            setError("");
             setSubmitting(true);
-            const res = await axios.post("/register", values);
+            const res = await axios.post("/register", values, {
+              withCredentials: true,
+            });
+            setCurrentUser({ id: res.data.id, role: res.data.role });
             history.push(res.data.redirectUrl);
             setSubmitting(false);
           } catch (err) {

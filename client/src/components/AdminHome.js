@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
+import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
+import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import { Formik, Field, Form, useField } from "formik";
 import {
   Button,
@@ -46,13 +48,30 @@ export default function AdminHome() {
     setLabels(e.target.value);
     setOpenTickets(
       labelledTickets.filter((ticket) => {
-        if (e.target.value.length === 0) return true;
-        return e.target.value.some((label) => {
-          if (ticket.name && ticket.name.split(",").includes(label)) {
-            return true;
-          }
-          return false;
-        });
+        if (ticket.status === "open") {
+          if (e.target.value.length === 0) return true;
+          return e.target.value.some((label) => {
+            if (ticket.name && ticket.name.split(",").includes(label)) {
+              return true;
+            }
+            return false;
+          });
+        }
+        return false;
+      })
+    );
+    setClosedTickets(
+      labelledTickets.filter((ticket) => {
+        if (ticket.status === "closed" || ticket.status === "closedbyadmin") {
+          if (e.target.value.length === 0) return true;
+          return e.target.value.some((label) => {
+            if (ticket.name && ticket.name.split(",").includes(label)) {
+              return true;
+            }
+            return false;
+          });
+        }
+        return false;
       })
     );
   }
@@ -84,7 +103,12 @@ export default function AdminHome() {
       });
       setLabelledTickets(res.data);
       setOpenTickets(res.data.filter((ticket) => ticket.status === "open"));
-      setClosedTickets(res.data.filter((ticket) => ticket.status === "closed"));
+      setClosedTickets(
+        res.data.filter(
+          (ticket) =>
+            ticket.status === "closed" || ticket.status === "closedbyadmin"
+        )
+      );
     }
     getTickets();
   }, []);
@@ -107,8 +131,13 @@ export default function AdminHome() {
                 res.data.filter((ticket) => ticket.status === "open")
               );
               setClosedTickets(
-                res.data.filter((ticket) => ticket.status === "closed")
+                res.data.filter(
+                  (ticket) =>
+                    ticket.status === "closed" ||
+                    ticket.status === "closedbyadmin"
+                )
               );
+              setLabels([]);
               setSort(1);
               setDisable(false);
               setSubmitting(false);
@@ -157,8 +186,16 @@ export default function AdminHome() {
             setValue(newValue);
           }}
         >
-          <Tab label="Open" />
-          <Tab label="Closed" />
+          <Tab
+            style={{ color: "var(--success)" }}
+            icon={<ErrorOutlineIcon />}
+            label="Open"
+          />
+          <Tab
+            style={{ color: "var(--error)" }}
+            icon={<CheckCircleOutlineIcon />}
+            label="Closed"
+          />
         </Tabs>
         <LabelSelect
           className="labelSelect"
@@ -195,7 +232,7 @@ export default function AdminHome() {
                 </span>
                 <p>{`#${ticket.id} opened ${formatTimeAgo(
                   ticket.created_date
-                )} by ${ticket.email}`}</p>
+                )} by ${ticket.email}, ${ticket.company}`}</p>
               </div>
             </Link>
           ))
