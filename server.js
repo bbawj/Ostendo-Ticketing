@@ -1,6 +1,5 @@
-if (process.env.NODE_ENV !== "production") {
-  require("dotenv").config();
-}
+require("dotenv").config();
+
 const express = require("express");
 const cors = require("cors");
 const bcrypt = require("bcrypt");
@@ -124,7 +123,6 @@ if (process.env.NODE_ENV === "production") {
     res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
   });
 }
-
 app.listen(PORT, () => {
   console.log("Server running on port:", PORT);
 });
