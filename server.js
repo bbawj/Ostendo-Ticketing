@@ -9,6 +9,7 @@ const initializePassport = require("./config/passport-config");
 const flash = require("express-flash");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
+const path = require("path");
 const pool = require("./config/db");
 
 initializePassport(
