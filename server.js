@@ -66,7 +66,7 @@ const { isAuth } = require("./authMiddleware");
 app.use("/api/ticket", ticketRoute);
 app.use("/api/comment", commentRoute);
 
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   try {
     //check if email already registered
     const [rows, fields] = await pool.execute(
@@ -93,13 +93,13 @@ app.post("/register", async (req, res) => {
   }
 });
 
-app.post("/login", passport.authenticate("local"), (req, res) => {
+app.post("/api/login", passport.authenticate("local"), (req, res) => {
   return res
     .status(200)
     .json({ id: req.user.id, role: req.user.role, redirectUrl: "/home" });
 });
 
-app.get("/isauth", isAuth, (req, res) => {
+app.get("/api/isauth", isAuth, (req, res) => {
   if (req.user) {
     return res.status(200).json({ id: req.user.id, role: req.user.role });
   }

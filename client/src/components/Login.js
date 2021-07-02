@@ -42,7 +42,7 @@ export default function Login() {
         })}
         onSubmit={async (values, { setSubmitting }) => {
           setSubmitting(true);
-          const res = await axios.post("/login", values, {
+          const res = await axios.post("/api/login", values, {
             withCredentials: true,
           });
           setSubmitting(false);

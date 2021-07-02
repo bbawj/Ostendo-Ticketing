@@ -16,7 +16,7 @@ export function UserProvider({ children }) {
   useEffect(() => {
     async function getUser() {
       try {
-        const res = await axios.get("/isauth", { withCredentials: true });
+        const res = await axios.get("/api/isauth", { withCredentials: true });
         setCurrentUser({ id: res.data.id, role: res.data.role });
       } catch (err) {
         history.push(err.response.data.redirectUrl);
