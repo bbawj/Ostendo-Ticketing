@@ -10,7 +10,6 @@ const flash = require("express-flash");
 const session = require("express-session");
 const MySQLStore = require("express-mysql-session")(session);
 const pool = require("./config/db");
-const nodemailer = require("nodemailer");
 
 initializePassport(
   passport,
@@ -26,10 +25,10 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 const sessionStore = new MySQLStore(
   {
-    host: "localhost",
-    user: "root",
+    host: "shsgv1.simplehost.sg",
+    user: "ostendoa_ticketing",
     password: process.env.DB_SECRET,
-    database: "ostendoticketing",
+    database: "ostendoa_ticketing",
   },
   pool
 );
@@ -114,6 +113,16 @@ app.post("/logout", (req, res) => {
   req.session.destroy();
   res.json({ redirectUrl: "/login", message: "Logged out." });
 });
+
+// Serve static assets if in production
+if (process.env.NODE_ENV === "production") {
+  // Set static folder
+  app.use(express.static("client/build"));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "client", "build", "index.html"));
+  });
+}
 
 app.listen(PORT, () => {
   console.log("Server running on port:", PORT);
