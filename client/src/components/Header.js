@@ -10,7 +10,9 @@ export default function Header() {
   const { currentUser } = useUser();
 
   async function handleLogout() {
-    const res = await axios.post("/logout", null, { withCredentials: true });
+    const res = await axios.post("/api/auth/logout", null, {
+      withCredentials: true,
+    });
     history.push(res.data.redirectUrl);
   }
 

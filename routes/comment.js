@@ -28,11 +28,13 @@ router.post("/", isAuth, async (req, res) => {
     const result = await pool.query("INSERT INTO comments SET ?", comment);
 
     if (req.user.role === "admin") {
+      const url =
+        process.env.NODE_ENV === "production"
+          ? `http://128.199.72.149/ticket/${req.body.ticket_id}`
+          : `http://localhost:3000/ticket/${req.body.ticket_id}`;
       const output = `
       <p>${req.user.email.split("@")[0]} has replied to your issue</p>
-      <a href="http://localhost:3000/ticket/${
-        req.body.ticket_id
-      }">View your issue</a>
+      <a href="${url}">View your issue</a>
       `;
       transporter.sendMail({
         from: process.env.MAIL_USER,

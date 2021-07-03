@@ -9,6 +9,9 @@ import { ThemeProvider } from "@material-ui/styles";
 import Login from "./Login";
 import { UserProvider } from "../contexts/UserContext";
 import TicketPage from "./TicketPage";
+import ForgotPassword from "./ForgotPassword";
+import ResetPassword from "./ResetPassword";
+import PrivateRoute from "./PrivateRoute";
 
 const THEME = createMuiTheme({
   typography: {
@@ -31,8 +34,10 @@ export default function App() {
             <Route exact path="/" component={Login} />
             <Route exact path="/login" component={Login} />
             <Route path="/signup" component={Signup} />
-            <Route path="/home" component={Home} />
-            <Route path="/ticket/:id" component={TicketPage} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset/:id/:token" component={ResetPassword} />
+            <PrivateRoute path="/home" component={Home} />
+            <PrivateRoute path="/ticket/:id" component={TicketPage} />
           </UserProvider>
         </Router>
       </ThemeProvider>

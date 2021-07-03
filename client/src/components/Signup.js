@@ -82,7 +82,7 @@ export default function Signup() {
           try {
             setError("");
             setSubmitting(true);
-            const res = await axios.post("/api/register", values, {
+            const res = await axios.post("/api/auth/register", values, {
               withCredentials: true,
             });
             setCurrentUser({ id: res.data.id, role: res.data.role });
