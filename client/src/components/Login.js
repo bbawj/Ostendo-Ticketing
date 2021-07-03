@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "./Signup.css";
 import { Formik, Field, Form, useField } from "formik";
 import * as Yup from "yup";
@@ -27,11 +27,15 @@ const MyTextField = ({ label, type, ...props }) => {
 export default function Login() {
   const history = useHistory();
   const { setCurrentUser } = useUser();
+  const [error, setError] = useState("");
 
   return (
     <div className="signup">
       <h2>Login</h2>
       <p>Sign in to your account</p>
+      {error && (
+        <span style={{ marginLeft: "1em", color: "red" }}>{error}</span>
+      )}
       <Formik
         initialValues={{ email: "", password: "", passwordConfirm: "" }}
         validationSchema={Yup.object({
@@ -41,13 +45,17 @@ export default function Login() {
           password: Yup.string().required("Required"),
         })}
         onSubmit={async (values, { setSubmitting }) => {
-          setSubmitting(true);
-          const res = await axios.post("/api/login", values, {
-            withCredentials: true,
-          });
-          setSubmitting(false);
-          setCurrentUser({ id: res.data.id, role: res.data.role });
-          history.push(res.data.redirectUrl);
+          try {
+            setSubmitting(true);
+            const res = await axios.post("/api/login", values, {
+              withCredentials: true,
+            });
+            setSubmitting(false);
+            setCurrentUser({ id: res.data.id, role: res.data.role });
+            history.push(res.data.redirectUrl);
+          } catch (err) {
+            setError("Email or password incorrect");
+          }
         }}
       >
         <Form>
