@@ -18,4 +18,8 @@ jobs:
           script: |
             cd Ostendo-Ticketing
             git pull
-            git status
+            npm i
+            pm2 reload server.js
+            cd client
+            npm i
+            npm run build

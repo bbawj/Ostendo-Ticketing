@@ -9,21 +9,26 @@ export function useUser() {
 
 export function UserProvider({ children }) {
   const [currentUser, setCurrentUser] = useState();
-  const value = { currentUser, setCurrentUser };
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function getUser() {
       try {
+        setLoading(true);
         const res = await axios.get("/api/auth/isauth", {
           withCredentials: true,
         });
         setCurrentUser({ id: res.data.id, role: res.data.role });
-      } catch (err) {
-        setCurrentUser();
-      }
+        setLoading(false);
+      } catch (err) {}
     }
     getUser();
   }, []);
+  const value = { currentUser, setCurrentUser };
 
-  return <UserContext.Provider value={value}>{children}</UserContext.Provider>;
+  return (
+    <UserContext.Provider value={value}>
+      {!loading && children}
+    </UserContext.Provider>
+  );
 }

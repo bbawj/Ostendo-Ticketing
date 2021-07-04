@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
@@ -21,6 +21,8 @@ import { formatTimeAgo } from "./FormatTime";
 import LabelSelect from "./LabelSelect";
 import "./AdminHome.css";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
+import { CSVLink } from "react-csv";
+import ExportSelect from "./ExportSelect";
 
 const MySelect = ({ ...props }) => {
   const [field] = useField(props);
@@ -43,6 +45,7 @@ export default function AdminHome() {
   const [labels, setLabels] = useState([]);
   const [labelledTickets, setLabelledTickets] = useState([]);
   const [disable, setDisable] = useState(false);
+  const formRef = useRef();
 
   function addLabel(e) {
     setLabels(e.target.value);
@@ -119,6 +122,7 @@ export default function AdminHome() {
       <div className="searchContainer">
         <Formik
           initialValues={{ text: "", company: "", start: "", end: "" }}
+          innerRef={formRef}
           onSubmit={async (values, { setSubmitting }) => {
             try {
               // search database
@@ -201,18 +205,26 @@ export default function AdminHome() {
             label="Closed"
           />
         </Tabs>
-        <LabelSelect
-          className="labelSelect"
-          labels={labels}
-          Icon={ArrowDropDownIcon}
-          addLabel={addLabel}
-        />
-        <Button
-          onClick={handleSort}
-          endIcon={sort ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
-        >
-          Sort By
-        </Button>
+        <div className="tabsGroup">
+          <LabelSelect
+            className="labelSelect"
+            labels={labels}
+            Icon={ArrowDropDownIcon}
+            addLabel={addLabel}
+          />
+          <Button
+            onClick={handleSort}
+            endIcon={sort ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+          >
+            Sort By
+          </Button>
+          {formRef.current && (
+            <ExportSelect
+              start={formRef.current.values.start}
+              end={formRef.current.values.end}
+            />
+          )}
+        </div>
       </div>
       <div className="ticketTable" value={value} hidden={value !== 0}>
         {!(openTickets.length === 0) ? (

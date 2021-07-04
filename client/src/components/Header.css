@@ -9,11 +9,12 @@
 .headerLogo {
   background-image: url("https://ostendoasia.com/wp-content/uploads/2016/12/oa_logo_b2.png");
   background-repeat: no-repeat;
-  background-position: center;
+  background-position: left;
   background-size: contain;
   margin-left: 2em;
-  width: 20%;
   height: 100%;
+  flex: 0.7;
+  flex-shrink: 0;
 }
 
 .headerLogo > a {

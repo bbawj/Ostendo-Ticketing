@@ -39,13 +39,23 @@ div.searchField {
 }
 .tabsPanel {
   display: flex;
+  width: 100%;
   border: 1px solid var(--accent2);
+  background-color: var(--accent);
 }
-.tabsPanel > .MuiTabs-root {
-  flex: 1;
+.tabsPanel .MuiTabs-root {
+  flex: 0.7;
+}
+.tabsPanel .MuiTabs-flexContainer {
+  width: 100%;
 }
 .tabsPanel > .MuiButton-root {
   background-color: var(--accent);
+}
+.tabsGroup {
+  display: flex;
+  justify-content: flex-end;
+  flex: 0.3;
 }
 
 .listTicketHeader {
@@ -60,6 +70,12 @@ div.searchField {
   background-color: var(--accent);
 }
 
+.exportSelect {
+  display: flex;
+  align-items: center;
+  background-color: var(--accent);
+}
+
 @media (max-width: 768px) {
   .searchContainer > form {
     flex-direction: column;
@@ -69,7 +85,10 @@ div.searchField {
   .labelSelect {
     font-size: 0;
   }
-  .tabsPanel > .MuiButton-root {
+  .tabsGroup > .MuiButton-root {
     font-size: 0;
+  }
+  .exportSelect > button {
+    padding: 0;
   }
 }
