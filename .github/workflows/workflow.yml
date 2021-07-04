@@ -8,7 +8,7 @@ jobs:
     name: Deploy
     runs-on: ubuntu-latest
     steps:
-      - name: Testing SSH
+      - name: SSH and pull
         uses: appleboy/ssh-action@master
         with:
           host: 128.199.72.149
