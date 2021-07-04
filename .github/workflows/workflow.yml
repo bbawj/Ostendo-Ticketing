@@ -15,11 +15,10 @@ jobs:
           username: root
           key: ${{ secrets.SSH_SECRET }}
           port: 22
+          script_stop: true
           script: |
             cd Ostendo-Ticketing
             git pull
-            bbawj
-            ${{secrets.ACCESS_TOKEN}}
             npm i
             pm2 reload server.js
             cd client
