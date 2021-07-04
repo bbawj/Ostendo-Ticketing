@@ -21,7 +21,6 @@ import { formatTimeAgo } from "./FormatTime";
 import LabelSelect from "./LabelSelect";
 import "./AdminHome.css";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
-import { CSVLink } from "react-csv";
 import ExportSelect from "./ExportSelect";
 
 const MySelect = ({ ...props }) => {
