@@ -13,7 +13,12 @@ export function formatTimeAgo(date) {
     { amount: Number.POSITIVE_INFINITY, name: "years" },
   ];
 
-  let duration = (new Date(date) - new Date()) / 1000;
+  let duration;
+  if (process.env.NODE_ENV === "production") {
+    duration = (new Date(date) - new Date() - 8 * 60 * 60 * 1000) / 1000;
+  } else {
+    duration = (new Date(date) - new Date()) / 1000;
+  }
 
   for (let i = 0; i < DIVISIONS.length; i++) {
     const division = DIVISIONS[i];

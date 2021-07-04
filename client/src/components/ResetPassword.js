@@ -63,38 +63,44 @@ export default function ResetPassword() {
             "Passwords must match"
           ),
         })}
-        onSubmit={async (values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting, setStatus }) => {
           try {
             setSubmitting(true);
             setMessage("");
             setError("");
             await axios.post(`/api/auth/reset-password/${id}/${token}`, values);
             setMessage("Your password has been reset. ");
+
+            setStatus("done");
           } catch (err) {
             setError("Failed to reset your password. Try requesting a ");
           }
           setSubmitting(false);
         }}
       >
-        <Form>
-          <div className="formFlex">
-            <Field
-              name="password"
-              type="password"
-              label="Password"
-              as={MyTextField}
-            />
-            <Field
-              name="passwordConfirm"
-              type="password"
-              label="Confirm Password"
-              as={MyTextField}
-            />
-          </div>
-          <Button variant="contained" type="submit">
-            Submit
-          </Button>
-        </Form>
+        {({ isSubmitting, status }) =>
+          status !== "done" && (
+            <Form>
+              <div className="formFlex">
+                <Field
+                  name="password"
+                  type="password"
+                  label="Password"
+                  as={MyTextField}
+                />
+                <Field
+                  name="passwordConfirm"
+                  type="password"
+                  label="Confirm Password"
+                  as={MyTextField}
+                />
+              </div>
+              <Button disabled={isSubmitting} variant="contained" type="submit">
+                Submit
+              </Button>
+            </Form>
+          )
+        }
       </Formik>
       <p>
         <Link to="/login">Cancel</Link>

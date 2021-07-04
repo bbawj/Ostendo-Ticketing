@@ -2,13 +2,18 @@
   width: 100%;
 }
 
-.searchContainer {
-  display: flex;
-  align-items: center;
-  margin-top: 1em;
+.adminHome > h2 {
+  padding: 1em 0;
 }
 
 .searchContainer > form {
+  display: flex;
+  align-items: center;
+  margin-top: 1em;
+  justify-content: space-evenly;
+}
+
+.searchHalf {
   display: flex;
   width: 100%;
   align-items: center;
@@ -53,4 +58,18 @@ div.searchField {
 
 .labelSelect {
   background-color: var(--accent);
+}
+
+@media (max-width: 768px) {
+  .searchContainer > form {
+    flex-direction: column;
+  }
+}
+@media (max-width: 480px) {
+  .labelSelect {
+    font-size: 0;
+  }
+  .tabsPanel > .MuiButton-root {
+    font-size: 0;
+  }
 }

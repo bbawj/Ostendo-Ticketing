@@ -129,9 +129,9 @@ export default function TicketPage() {
   return (
     <div className="ticketPage">
       <div className="ticketHeader">
-        <h1>
+        <h2>
           {ticket.title} <span>#{ticket.id}</span>
-        </h1>
+        </h2>
         <div className="ticketSubheader">
           {ticket.status === "open" ? (
             <div className="ticketStatus open">
@@ -244,7 +244,10 @@ export default function TicketPage() {
                 );
               }
             })}
-          <div className="ticketContent" style={{ marginTop: "1em" }}>
+          <div
+            className="ticketContent"
+            style={{ marginTop: "1em", marginLeft: "-0.05em" }}
+          >
             <div className="ticketContentHeader">
               <h3>Respond</h3>
             </div>

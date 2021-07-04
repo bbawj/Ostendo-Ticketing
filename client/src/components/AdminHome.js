@@ -148,33 +148,37 @@ export default function AdminHome() {
           }}
         >
           <Form>
-            <Field
-              name="text"
-              as={TextField}
-              variant="outlined"
-              fullWidth
-              placeholder="Search tickets"
-            />
-            <Field
-              className="searchField"
-              InputLabelProps={{ shrink: true }}
-              as={TextField}
-              name="start"
-              label="Start"
-              type="date"
-            />
-            <Field
-              className="searchField"
-              as={TextField}
-              name="end"
-              label="End"
-              InputLabelProps={{ shrink: true }}
-              type="date"
-            />
-            <Field as={MySelect} name="company" />
-            <IconButton type="submit" disabled={disable}>
-              <SearchIcon />
-            </IconButton>
+            <div className="searchHalf">
+              <Field
+                name="text"
+                as={TextField}
+                variant="outlined"
+                fullWidth
+                placeholder="Search tickets"
+              />
+            </div>
+            <div className="searchHalf">
+              <Field
+                className="searchField"
+                InputLabelProps={{ shrink: true }}
+                as={TextField}
+                name="start"
+                label="Start"
+                type="date"
+              />
+              <Field
+                className="searchField"
+                as={TextField}
+                name="end"
+                label="End"
+                InputLabelProps={{ shrink: true }}
+                type="date"
+              />
+              <Field as={MySelect} name="company" />
+              <IconButton type="submit" disabled={disable}>
+                <SearchIcon />
+              </IconButton>
+            </div>
           </Form>
         </Formik>
       </div>

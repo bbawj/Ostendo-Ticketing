@@ -13,7 +13,13 @@
 
 .ticketMain {
   display: flex;
-  width: 100%;
+  margin: 0 1em;
+}
+
+@media (max-width: 600px) {
+  .ticketMain {
+    flex-direction: column;
+  }
 }
 
 .ticketContentColumn {
@@ -35,7 +41,7 @@
   padding-bottom: 1em;
   padding-top: 1em;
   border-bottom: 1px solid#e1e4e8;
-  margin-bottom: 1em;
+  margin: 0 1em 1em 1em;
 }
 
 .ticketHeader > h1 > span {
@@ -100,7 +106,7 @@
   background-color: #f6f8fa;
   border: 1px solid #e1e4e8;
   position: relative;
-  padding: 1em 0 1em 2em;
+  padding: 1em 2em 1em 2em;
   border-radius: 10px 10px 0 0;
 }
 .ticketContentMain {
@@ -129,4 +135,13 @@
 .updateContainer {
   display: flex;
   align-items: center;
+}
+
+@media (max-width: 600px) {
+  .ticketSubheader > .MuiButton-root {
+    font-size: 0;
+  }
+  .ticketHeader > h1 {
+    font-size: 1.5rem;
+  }
 }

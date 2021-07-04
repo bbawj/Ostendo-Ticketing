@@ -93,35 +93,37 @@ export default function Signup() {
           }
         }}
       >
-        <Form>
-          <div className="formFlex">
-            <Field name="email" type="email" as={MyTextField} label="Email" />
-            <Field
-              name="company"
-              type="select"
-              as={MySelectField}
-              label="Company"
-            />
-          </div>
-          <div className="formFlex">
-            <Field
-              name="password"
-              type="password"
-              label="Password"
-              as={MyTextField}
-            />
-            <Field
-              name="passwordConfirm"
-              type="password"
-              label="Confirm Password"
-              as={MyTextField}
-            />
-          </div>
+        {({ isSubmitting }) => (
+          <Form>
+            <div className="formFlex">
+              <Field name="email" type="email" as={MyTextField} label="Email" />
+              <Field
+                name="company"
+                type="select"
+                as={MySelectField}
+                label="Company"
+              />
+            </div>
+            <div className="formFlex">
+              <Field
+                name="password"
+                type="password"
+                label="Password"
+                as={MyTextField}
+              />
+              <Field
+                name="passwordConfirm"
+                type="password"
+                label="Confirm Password"
+                as={MyTextField}
+              />
+            </div>
 
-          <Button variant="contained" type="submit">
-            Sign up
-          </Button>
-        </Form>
+            <Button disabled={isSubmitting} variant="contained" type="submit">
+              Sign up
+            </Button>
+          </Form>
+        )}
       </Formik>
       <p>
         Have an account? <Link to="/">Login.</Link>

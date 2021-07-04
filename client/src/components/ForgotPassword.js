@@ -48,27 +48,37 @@ export default function ForgotPassword() {
             .email("Invalid email address")
             .required("Required"),
         })}
-        onSubmit={async (values, { setSubmitting }) => {
+        onSubmit={async (values, { setSubmitting, setStatus }) => {
           try {
             setMessage("");
             setError("");
             setSubmitting(true);
             await axios.post("/api/auth/forgot-password", values);
             setMessage("Reset link sent. Please check your email.");
+            setStatus("done");
           } catch (err) {
             setError("User with email does not exist.");
           }
           setSubmitting(false);
         }}
       >
-        <Form>
-          <div className="formFlex">
-            <Field name="email" type="email" as={MyTextField} label="Email" />
-          </div>
-          <Button variant="contained" type="submit">
-            Submit
-          </Button>
-        </Form>
+        {({ isSubmitting, status }) =>
+          status !== "done" && (
+            <Form>
+              <div className="formFlex">
+                <Field
+                  name="email"
+                  type="email"
+                  as={MyTextField}
+                  label="Email"
+                />
+              </div>
+              <Button disabled={isSubmitting} variant="contained" type="submit">
+                Submit
+              </Button>
+            </Form>
+          )
+        }
       </Formik>
       <p>
         <Link to="/login">Cancel</Link>
