@@ -221,6 +221,7 @@ export default function AdminHome() {
             <ExportSelect
               start={formRef.current.values.start}
               end={formRef.current.values.end}
+              data={labelledTickets}
             />
           )}
         </div>

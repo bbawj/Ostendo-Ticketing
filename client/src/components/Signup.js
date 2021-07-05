@@ -42,7 +42,7 @@ const MySelectField = ({ label, ...props }) => {
       <InputLabel id={label}>{label}</InputLabel>
       <Select style={{ width: "100%" }} {...field} labelId={label}>
         <MenuItem value="">Company</MenuItem>
-        <MenuItem value="GMP Recruitment">Ostendo Asia</MenuItem>
+        <MenuItem value="Ostendo Asia">Ostendo Asia</MenuItem>
         <MenuItem value="GMP Recruitment">GMP Recruitment</MenuItem>
       </Select>
       <FormHelperText error={!!errorText}>{errorText}</FormHelperText>

@@ -145,54 +145,58 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
   // validate with status schema
   const { error } = updateSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
-  //check if ticket exists
-  const [rows] = await pool.query(
-    "SELECT * FROM tickets WHERE id = ? LIMIT 1",
-    req.params.ticketId
-  );
-  if (rows.length === 0)
-    return res.status(404).json({ message: "Ticket not found" });
-  // update status only
-  if (req.body.status) {
-    //update closed_date datetime if status is changed to close
-    if (req.body.status === "open") {
-      await pool.query("UPDATE tickets SET status = ? WHERE id = ?", [
-        req.body.status,
-        req.params.ticketId,
-      ]);
-    } else {
-      await pool.query(
-        "UPDATE tickets SET status = ?, closed_date = current_timestamp WHERE id = ?",
-        [req.body.status, req.params.ticketId]
-      );
-    }
-    // add new comment for status update
-    const statusComment = {
-      type: "update",
-      owner_id: req.user.id,
-      ticket_id: req.params.ticketId,
-      text: req.body.status,
-    };
-    await pool.query("INSERT INTO comments SET ?", statusComment);
-    return res
-      .status(200)
-      .json({ message: "Successfully updated ticket status" });
-  } else if (req.body.label) {
-    if (req.body.method === "add") {
-      const label = {
+  try {
+    //check if ticket exists
+    const [rows] = await pool.query(
+      "SELECT * FROM tickets WHERE id = ? LIMIT 1",
+      req.params.ticketId
+    );
+    if (rows.length === 0)
+      return res.status(404).json({ message: "Ticket not found" });
+    // update status only
+    if (req.body.status) {
+      //update closed_date datetime if status is changed to close
+      if (req.body.status === "open") {
+        await pool.query("UPDATE tickets SET status = ? WHERE id = ?", [
+          req.body.status,
+          req.params.ticketId,
+        ]);
+      } else {
+        await pool.query(
+          "UPDATE tickets SET status = ?, closed_date = current_timestamp WHERE id = ?",
+          [req.body.status, req.params.ticketId]
+        );
+      }
+      // add new comment for status update
+      const statusComment = {
+        type: "update",
+        owner_id: req.user.id,
         ticket_id: req.params.ticketId,
-        label_id: req.body.label,
+        text: req.body.status,
       };
-      await pool.query("INSERT INTO tickets_labels SET ?", label);
-    } else if (req.body.method === "delete") {
-      await pool.query(
-        "DELETE FROM tickets_labels WHERE ticket_id = ? AND label_id = ?",
-        [req.params.ticketId, req.body.label]
-      );
+      await pool.query("INSERT INTO comments SET ?", statusComment);
+      return res
+        .status(200)
+        .json({ message: "Successfully updated ticket status" });
+    } else if (req.body.label) {
+      if (req.body.method === "add") {
+        const label = {
+          ticket_id: req.params.ticketId,
+          label_id: req.body.label,
+        };
+        await pool.query("INSERT INTO tickets_labels SET ?", label);
+      } else if (req.body.method === "delete") {
+        await pool.query(
+          "DELETE FROM tickets_labels WHERE ticket_id = ? AND label_id = ?",
+          [req.params.ticketId, req.body.label]
+        );
+      }
+      return res
+        .status(200)
+        .json({ message: "Successfully updated ticket label" });
     }
-    return res
-      .status(200)
-      .json({ message: "Successfully updated ticket label" });
+  } catch (error) {
+    return res.status(500).json({ message: error });
   }
 });
 

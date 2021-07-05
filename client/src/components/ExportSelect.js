@@ -39,8 +39,8 @@ export default function ExportSelect({ start, end, data }) {
 
   async function handleExport(type) {
     try {
-      if (!start && !end) {
-        return alert("Search with select first.");
+      if (!start || !end || !data) {
+        return alert("No data to export. Try searching for something first.");
       }
       let info;
       if (type !== "detail") {
@@ -53,7 +53,6 @@ export default function ExportSelect({ start, end, data }) {
       } else {
         info = data;
       }
-      console.log(data);
       const csvRows = [];
       csvRows.push(headerObj[type].join(","));
       for (const row of info) {
