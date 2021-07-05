@@ -274,7 +274,7 @@ export default function TicketPage() {
             </div>
           </div>
         </div>
-        <TicketSidebar id={ticket.id} label={ticket.name} />
+        <TicketSidebar id={ticket.id} label={ticket.label} />
       </div>
     </div>
   );

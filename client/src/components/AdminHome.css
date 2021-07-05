@@ -42,24 +42,24 @@ div.searchField {
   width: 100%;
   border: 1px solid var(--accent2);
   background-color: var(--accent);
+  justify-content: space-between;
 }
 .tabsPanel .MuiTabs-root {
-  flex: 0.7;
+  flex-grow: 0.7;
 }
-.tabsPanel .MuiTabs-flexContainer {
-  width: 100%;
-}
+
 .tabsPanel > .MuiButton-root {
   background-color: var(--accent);
 }
 .tabsGroup {
   display: flex;
-  justify-content: flex-end;
-  flex: 0.3;
+  flex-grow: 0.2;
+  justify-content: center;
 }
 
 .listTicketHeader {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
 }
 .listTicketHeader > h3 {
@@ -87,6 +87,10 @@ div.searchField {
   }
   .tabsGroup > .MuiButton-root {
     font-size: 0;
+    min-width: 0;
+  }
+  .tabsGroup > .MuiButton-root .MuiButton-endIcon {
+    margin: 0;
   }
   .exportSelect > button {
     padding: 0;

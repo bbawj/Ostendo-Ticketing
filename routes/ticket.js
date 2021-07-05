@@ -21,6 +21,10 @@ const filterSchema = Joi.object({
   company: Joi.string().allow(""),
 });
 
+const exportSchema = Joi.object({
+  type: Joi.string().valid("user", "category"),
+});
+
 //post filter values from form to get ticket values
 router.post("/admin", isAdmin, async (req, res) => {
   //Joi validation
@@ -28,7 +32,7 @@ router.post("/admin", isAdmin, async (req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   try {
     let queryString =
-      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
+      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
     let queryArr = [];
     //build the query string
     if (req.body.text) {
@@ -60,7 +64,7 @@ router.post("/admin", isAdmin, async (req, res) => {
     // use queryArr as second arguement if non-null
     if (queryArr.length === 0) {
       const [rows] = await pool.query(
-        "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
+        "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
       );
       return res.status(200).json(rows);
     } else {
@@ -75,7 +79,7 @@ router.post("/admin", isAdmin, async (req, res) => {
 router.get("/admin", isAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
+      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
     );
     return res.status(200).json(rows);
   } catch (err) {
@@ -87,7 +91,7 @@ router.get("/admin", isAdmin, async (req, res) => {
 router.get("/user", isAuth, async (req, res) => {
   try {
     const [data] = await pool.query(
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.owner_id = ? GROUP BY t.id",
+      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.owner_id = ? GROUP BY t.id",
       [req.user.id]
     );
     return res.status(200).json(data);
@@ -123,7 +127,7 @@ router.get("/:ticketId", isAuth, async (req, res) => {
   }
   try {
     const [ticketData] = await pool.query(
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as name FROM tickets as t JOIN users as u ON t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.id = ?",
+      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as label FROM tickets as t JOIN users as u ON t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.id = ?",
       [req.params.ticketId]
     );
     const [commentData] = await pool.query(
@@ -150,10 +154,18 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
     return res.status(404).json({ message: "Ticket not found" });
   // update status only
   if (req.body.status) {
-    await pool.query("UPDATE tickets SET status = ? WHERE id = ?", [
-      req.body.status,
-      req.params.ticketId,
-    ]);
+    //update closed_date datetime if status is changed to close
+    if (req.body.status === "open") {
+      await pool.query("UPDATE tickets SET status = ? WHERE id = ?", [
+        req.body.status,
+        req.params.ticketId,
+      ]);
+    } else {
+      await pool.query(
+        "UPDATE tickets SET status = ?, closed_date = current_timestamp WHERE id = ?",
+        [req.body.status, req.params.ticketId]
+      );
+    }
     // add new comment for status update
     const statusComment = {
       type: "update",
@@ -185,6 +197,9 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
 });
 
 router.post("/export", async (req, res) => {
+  // validate with export schema
+  const { error } = exportSchema.validate(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
   if (req.body.type === "user") {
     const [rows] = await pool.query(
       "select u.email, count(*) as count from tickets as t join users as u on t.owner_id = u.id where t.created_date >= ? and t.created_date <= ? group by u.id",

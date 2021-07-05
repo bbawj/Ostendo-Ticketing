@@ -53,7 +53,7 @@ export default function AdminHome() {
         if (ticket.status === "open") {
           if (e.target.value.length === 0) return true;
           return e.target.value.some((label) => {
-            if (ticket.name && ticket.name.split(",").includes(label)) {
+            if (ticket.label && ticket.label.split(",").includes(label)) {
               return true;
             }
             return false;
@@ -67,7 +67,7 @@ export default function AdminHome() {
         if (ticket.status === "closed" || ticket.status === "closedbyadmin") {
           if (e.target.value.length === 0) return true;
           return e.target.value.some((label) => {
-            if (ticket.name && ticket.name.split(",").includes(label)) {
+            if (ticket.label && ticket.label.split(",").includes(label)) {
               return true;
             }
             return false;
@@ -238,8 +238,8 @@ export default function AdminHome() {
               <div className="ticket">
                 <span className="listTicketHeader">
                   <h3>{ticket.title} </h3>
-                  {ticket.name &&
-                    ticket.name.split(",").map((label) => (
+                  {ticket.label &&
+                    ticket.label.split(",").map((label) => (
                       <span key={label} className="label">
                         {label}
                       </span>
@@ -268,8 +268,8 @@ export default function AdminHome() {
               <div className="ticket">
                 <span className="listTicketHeader">
                   <h3>{ticket.title} </h3>
-                  {ticket.name &&
-                    ticket.name.split(",").map((label) => (
+                  {ticket.label &&
+                    ticket.label.split(",").map((label) => (
                       <span key={label} className="label">
                         {label}
                       </span>

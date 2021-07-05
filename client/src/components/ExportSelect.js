@@ -6,9 +6,22 @@ import axios from "../axios";
 const headerObj = {
   user: ["email", "count"],
   category: ["name", "count"],
+  detail: [
+    "id",
+    "owner_id",
+    "assigned_id",
+    "status",
+    "title",
+    "description",
+    "created_date",
+    "closed_date",
+    "email",
+    "company",
+    "label",
+  ],
 };
 
-export default function ExportSelect({ start, end }) {
+export default function ExportSelect({ start, end, data }) {
   const [open, setOpen] = useState(false);
   const [exportType, setExportType] = useState("");
 
@@ -26,14 +39,24 @@ export default function ExportSelect({ start, end }) {
 
   async function handleExport(type) {
     try {
-      const res = await axios.post(
-        "/api/ticket/export",
-        { start: start, end: end, type: type },
-        { withCredentials: true }
-      );
+      if (!start && !end) {
+        return alert("Search with select first.");
+      }
+      let info;
+      if (type !== "detail") {
+        const res = await axios.post(
+          "/api/ticket/export",
+          { start: start, end: end, type: type },
+          { withCredentials: true }
+        );
+        info = res.data.data;
+      } else {
+        info = data;
+      }
+      console.log(data);
       const csvRows = [];
       csvRows.push(headerObj[type].join(","));
-      for (const row of res.data.data) {
+      for (const row of info) {
         const values = headerObj[type].map((header) => {
           const escaped = ("" + row[header]).replace(/"/g, '\\"');
           return `"${escaped}"`;
@@ -63,9 +86,20 @@ export default function ExportSelect({ start, end }) {
         onClose={() => setOpen(false)}
         onOpen={() => setOpen(true)}
       >
-        <MenuItem value="user">
-          <Button onClick={() => handleExport("user")}>Report by user</Button>
-        </MenuItem>
+        {(!start || !end) && (
+          <MenuItem>
+            <p style={{ whiteSpace: "pre-wrap" }}>
+              Search with a date range to enable exporting.
+            </p>
+          </MenuItem>
+        )}
+        {start &&
+          end &&
+          Object.keys(headerObj).map((key) => (
+            <MenuItem value={key} key={key}>
+              <Button onClick={() => handleExport(key)}>Report by {key}</Button>
+            </MenuItem>
+          ))}
       </Select>
     </div>
   );
