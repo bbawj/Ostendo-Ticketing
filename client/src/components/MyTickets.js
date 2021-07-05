@@ -87,7 +87,7 @@ export default function MyTickets() {
             </Link>
           ))
         ) : (
-          <h3>No opened tickets</h3>
+          <h3 className="ticketPlaceholder">No opened tickets</h3>
         )}
       </div>
       <div value={value} hidden={value !== 1}>
@@ -117,7 +117,7 @@ export default function MyTickets() {
             </Link>
           ))
         ) : (
-          <h3>No closed tickets</h3>
+          <h3 className="ticketPlaceholder">No closed tickets</h3>
         )}
       </div>
     </div>

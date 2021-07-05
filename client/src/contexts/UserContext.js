@@ -20,7 +20,10 @@ export function UserProvider({ children }) {
         });
         setCurrentUser({ id: res.data.id, role: res.data.role });
         setLoading(false);
-      } catch (err) {}
+      } catch (err) {
+        setCurrentUser();
+        setLoading(false);
+      }
     }
     getUser();
   }, []);

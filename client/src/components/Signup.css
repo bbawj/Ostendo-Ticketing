@@ -5,7 +5,7 @@
   padding: 2em 1em 2em 1em;
   background-color: white;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
-  width: 70%;
+  width: 80%;
   max-width: 600px;
 }
 
@@ -19,33 +19,22 @@
   padding-left: 1em;
 }
 
-.formFields {
-  margin: 1em;
-  width: 100%;
-}
-
 .signup form {
-  display: flex;
-  flex-direction: column;
-  text-align: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(125px, 1fr));
+  gap: 1em;
+  margin: 0 1em;
 }
 
 .signup .MuiButton-root {
   background-color: var(--theme);
   color: white;
-  margin: 2em 1em 2em 1em;
+  margin: 2em 0;
 }
 
 .signup a:link,
 .signup a:visited {
   color: var(--theme);
-}
-
-.formFlex {
-  display: flex;
-  align-items: center;
-  width: 100%;
 }
 
 .formFields label {
@@ -58,5 +47,8 @@
   .signup {
     width: 100%;
     box-shadow: none;
+  }
+  .signup form {
+    grid-template-columns: 1fr;
   }
 }

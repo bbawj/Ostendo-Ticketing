@@ -42,6 +42,7 @@ const MySelectField = ({ label, ...props }) => {
       <InputLabel id={label}>{label}</InputLabel>
       <Select style={{ width: "100%" }} {...field} labelId={label}>
         <MenuItem value="">Company</MenuItem>
+        <MenuItem value="GMP Recruitment">Ostendo Asia</MenuItem>
         <MenuItem value="GMP Recruitment">GMP Recruitment</MenuItem>
       </Select>
       <FormHelperText error={!!errorText}>{errorText}</FormHelperText>
@@ -95,29 +96,25 @@ export default function Signup() {
       >
         {({ isSubmitting }) => (
           <Form>
-            <div className="formFlex">
-              <Field name="email" type="email" as={MyTextField} label="Email" />
-              <Field
-                name="company"
-                type="select"
-                as={MySelectField}
-                label="Company"
-              />
-            </div>
-            <div className="formFlex">
-              <Field
-                name="password"
-                type="password"
-                label="Password"
-                as={MyTextField}
-              />
-              <Field
-                name="passwordConfirm"
-                type="password"
-                label="Confirm Password"
-                as={MyTextField}
-              />
-            </div>
+            <Field name="email" type="email" as={MyTextField} label="Email" />
+            <Field
+              name="company"
+              type="select"
+              as={MySelectField}
+              label="Company"
+            />
+            <Field
+              name="password"
+              type="password"
+              label="Password"
+              as={MyTextField}
+            />
+            <Field
+              name="passwordConfirm"
+              type="password"
+              label="Confirm Password"
+              as={MyTextField}
+            />
 
             <Button disabled={isSubmitting} variant="contained" type="submit">
               Sign up
