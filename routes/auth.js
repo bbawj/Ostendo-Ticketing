@@ -7,14 +7,6 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 
-const schema = Joi.object({
-  currentUser: Joi.number().required(),
-  ticket_id: Joi.number().required(),
-  text: Joi.string().required(),
-  email: Joi.string().required(),
-  title: Joi.string().required(),
-});
-
 const resetSchema = Joi.object({
   password: Joi.string().required(),
   passwordConfirm: Joi.string().required().valid(Joi.ref("password")),
@@ -23,10 +15,9 @@ const resetSchema = Joi.object({
 router.post("/register", async (req, res) => {
   try {
     //check if email already registered
-    const [rows, fields] = await pool.execute(
-      "SELECT * FROM users WHERE email = ?",
-      [req.body.email]
-    );
+    const [rows] = await pool.execute("SELECT * FROM users WHERE email = ?", [
+      req.body.email,
+    ]);
     if (rows.length !== 0)
       return res.status(404).send({ message: "User already registered" });
     //create user
@@ -38,9 +29,7 @@ router.post("/register", async (req, res) => {
     };
     const result = await pool.query("INSERT INTO users SET ?", newUser);
     passport.authenticate("local")(req, res, () => {
-      return res
-        .status(200)
-        .json({ id: req.user.id, role: req.user.role, redirectUrl: "/home" });
+      return res.status(200).json({ id: req.user.id, role: req.user.role });
     });
   } catch (err) {
     return res.status(500).send({ error: err.message });
@@ -48,9 +37,7 @@ router.post("/register", async (req, res) => {
 });
 
 router.post("/login", passport.authenticate("local"), (req, res) => {
-  return res
-    .status(200)
-    .json({ id: req.user.id, role: req.user.role, redirectUrl: "/home" });
+  return res.status(200).json({ id: req.user.id, role: req.user.role });
 });
 
 router.get("/isauth", isAuth, (req, res) => {
@@ -63,7 +50,7 @@ router.get("/isauth", isAuth, (req, res) => {
 router.post("/logout", (req, res) => {
   req.logout();
   req.session.destroy();
-  res.json({ redirectUrl: "/login", message: "Logged out." });
+  res.json({ message: "Logged out." });
 });
 
 router.post("/forgot-password", async (req, res) => {

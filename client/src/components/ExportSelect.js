@@ -46,7 +46,11 @@ export default function ExportSelect({ start, end, data }) {
       if (type !== "detail") {
         const res = await axios.post(
           "/api/ticket/export",
-          { start: start, end: end, type: type },
+          {
+            start: start,
+            end: new Date(new Date(end).getTime() + 24 * 60 * 60 * 1000),
+            type: type,
+          },
           { withCredentials: true }
         );
         info = res.data.data;

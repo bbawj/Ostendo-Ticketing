@@ -88,7 +88,7 @@ export default function Signup() {
             });
             setCurrentUser({ id: res.data.id, role: res.data.role });
             setSubmitting(false);
-            history.push(res.data.redirectUrl);
+            history.push("/home");
           } catch (err) {
             setError(err.response.data.message);
           }

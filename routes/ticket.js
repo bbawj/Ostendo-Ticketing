@@ -27,6 +27,8 @@ const filterSchema = Joi.object({
 
 const exportSchema = Joi.object({
   type: Joi.string().valid("user", "category"),
+  start: Joi.string().required(),
+  end: Joi.string().required(),
 });
 
 //post filter values from form to get ticket values
@@ -263,13 +265,13 @@ router.post("/export", isAuth, async (req, res) => {
   if (error) return res.status(400).send(error.details[0].message);
   if (req.body.type === "user") {
     const [rows] = await pool.query(
-      "select u.email, count(*) as count from tickets as t join users as u on t.owner_id = u.id where t.created_date >= ? and t.created_date <= ? group by u.id",
+      "select u.email, count(*) as count from tickets as t join users as u on t.owner_id = u.id where t.created_date >= ? and t.created_date < ? group by u.id",
       [req.body.start, req.body.end]
     );
     return res.status(200).json({ data: rows });
   } else if (req.body.type === "category") {
     const [rows] = await pool.query(
-      "SELECT l.name, COUNT(*) as count FROM tickets AS t JOIN tickets_labels as tl on t.owner_id=tl.ticket_id JOIN labels AS l on tl.label_id=l.id WHERE t.created_date >= ? AND t.created_date <= ? GROUP BY l.name",
+      "SELECT l.name, COUNT(*) as count FROM tickets AS t JOIN tickets_labels as tl on t.owner_id=tl.ticket_id JOIN labels AS l on tl.label_id=l.id WHERE t.created_date >= ? AND t.created_date < ? GROUP BY l.name",
       [req.body.start, req.body.end]
     );
     return res.status(200).json({ data: rows });

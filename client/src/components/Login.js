@@ -4,7 +4,7 @@ import { Formik, Field, Form, useField } from "formik";
 import * as Yup from "yup";
 import { TextField, Button } from "@material-ui/core";
 import axios from "../axios";
-import { useHistory, Link } from "react-router-dom";
+import { useHistory, Link, useLocation } from "react-router-dom";
 import { useUser } from "../contexts/UserContext";
 
 const MyTextField = ({ label, type, ...props }) => {
@@ -28,6 +28,7 @@ export default function Login() {
   const history = useHistory();
   const { setCurrentUser } = useUser();
   const [error, setError] = useState("");
+  const { state } = useLocation();
 
   return (
     <div className="signup">
@@ -52,8 +53,14 @@ export default function Login() {
             });
             setSubmitting(false);
             setCurrentUser({ id: res.data.id, role: res.data.role });
-            history.push(res.data.redirectUrl);
+            //redirect users to page they were trying to navigate
+            if (state && state.from) {
+              history.push(state.from);
+            } else {
+              history.push("/home");
+            }
           } catch (err) {
+            console.log(err);
             setError("Email or password incorrect");
           }
         }}

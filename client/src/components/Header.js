@@ -7,13 +7,14 @@ import { useUser } from "../contexts/UserContext";
 
 export default function Header() {
   const history = useHistory();
-  const { currentUser } = useUser();
+  const { currentUser, setCurrentUser } = useUser();
 
   async function handleLogout() {
-    const res = await axios.post("/api/auth/logout", null, {
+    await axios.post("/api/auth/logout", null, {
       withCredentials: true,
     });
-    history.push(res.data.redirectUrl);
+    setCurrentUser();
+    history.push("/login");
   }
 
   return (
