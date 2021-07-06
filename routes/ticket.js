@@ -114,10 +114,7 @@ router.post("/", isAuth, async (req, res) => {
     const ticket = { ...req.body, owner_id: req.user.id };
     const result = await pool.query("INSERT INTO tickets SET ?", ticket);
     // send email to default admin
-    const url =
-      process.env.NODE_ENV === "production"
-        ? `http://128.199.72.149/ticket/${result[0].insertId}`
-        : `http://localhost:3000/ticket/${result[0].insertId}`;
+    const url = `http://128.199.72.149/ticket/${result[0].insertId}`;
     const output = `
       <a href="${url}">View new issue</a>
       `;
@@ -174,10 +171,7 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
       return res.status(404).json({ message: "Ticket not found" });
     // update status only
     //set emil urls
-    const url =
-      process.env.NODE_ENV === "production"
-        ? `http://128.199.72.149/ticket/${req.params.ticketId}`
-        : `http://localhost:3000/ticket/${req.params.ticketId}`;
+    const url = `http://128.199.72.149/ticket/${req.params.ticketId}`;
     if (req.body.status) {
       //update closed_date datetime if status is changed to close
       if (req.body.status === "open") {

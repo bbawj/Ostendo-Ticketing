@@ -26,7 +26,7 @@ export default function TicketPage() {
           currentUser: currentUser.id,
           ticket_id: ticket.id,
           text: response,
-          email: currentUser.role === "admin" ? ticket.assigned : ticket.email,
+          email: currentUser.role === "admin" ? ticket.email : ticket.assigned,
           title: ticket.title,
         },
         { withCredentials: true }
