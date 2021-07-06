@@ -2,6 +2,7 @@ const router = require("express").Router();
 const pool = require("../config/db");
 const { isAuth, isAdmin } = require("../authMiddleware");
 const Joi = require("joi");
+const transporter = require("../config/mail");
 
 const schema = Joi.object({
   title: Joi.string().required(),
@@ -11,6 +12,7 @@ const schema = Joi.object({
 const updateSchema = Joi.object({
   status: Joi.string().valid("open", "closed", "closedbyadmin"),
   label: Joi.number().integer(),
+  conclusion: Joi.string().allow(""),
   method: Joi.string().valid("add", "delete"),
 });
 
@@ -108,7 +110,21 @@ router.post("/", isAuth, async (req, res) => {
   //build POST body
   try {
     const ticket = { ...req.body, owner_id: req.user.id };
-    await pool.query("INSERT INTO tickets SET ?", ticket);
+    const result = await pool.query("INSERT INTO tickets SET ?", ticket);
+    // send email to default admin
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `http://128.199.72.149/ticket/${result[0].insertId}`
+        : `http://localhost:3000/ticket/${result[0].insertId}`;
+    const output = `
+      <a href="${url}">View new issue</a>
+      `;
+    transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to: "brendanawjang@gmail.com", // defualt admin email
+      subject: "New Issue Created",
+      html: output,
+    });
     return res.status(200).json({ message: "Successfully created ticket" });
   } catch (e) {
     return res.status(500).json({ message: e });
@@ -144,7 +160,8 @@ router.get("/:ticketId", isAuth, async (req, res) => {
 router.patch("/:ticketId", isAuth, async (req, res) => {
   // validate with status schema
   const { error } = updateSchema.validate(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  // console.log(error.details[0].message);
+  if (error) return res.status(400).json({ message: error.details[0].message });
   try {
     //check if ticket exists
     const [rows] = await pool.query(
@@ -163,16 +180,16 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
         ]);
       } else {
         await pool.query(
-          "UPDATE tickets SET status = ?, closed_date = current_timestamp WHERE id = ?",
-          [req.body.status, req.params.ticketId]
+          "UPDATE tickets SET status = ?, conclusion = ? ,closed_date = current_timestamp WHERE id = ?",
+          [req.body.status, req.body.conclusion, req.params.ticketId]
         );
       }
       // add new comment for status update
       const statusComment = {
-        type: "update",
+        type: req.body.status,
         owner_id: req.user.id,
         ticket_id: req.params.ticketId,
-        text: req.body.status,
+        text: req.body.status === "open" ? "" : req.body.conclusion,
       };
       await pool.query("INSERT INTO comments SET ?", statusComment);
       return res
@@ -200,7 +217,7 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
   }
 });
 
-router.post("/export", async (req, res) => {
+router.post("/export", isAuth, async (req, res) => {
   // validate with export schema
   const { error } = exportSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);

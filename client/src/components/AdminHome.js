@@ -233,7 +233,6 @@ export default function AdminHome() {
               key={ticket.id}
               to={{
                 pathname: `/ticket/${ticket.id}`,
-                state: { ticketId: ticket.id },
               }}
             >
               <div className="ticket">
@@ -263,7 +262,6 @@ export default function AdminHome() {
               key={ticket.id}
               to={{
                 pathname: `/ticket/${ticket.id}`,
-                state: { ticketId: ticket.id },
               }}
             >
               <div className="ticket">

@@ -1,6 +1,6 @@
 import axios from "../axios";
 import React, { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import "./Ticket.css";
@@ -8,9 +8,10 @@ import TicketSidebar from "./TicketSidebar";
 import TextareaAutosize from "@material-ui/core/TextareaAutosize";
 import { Button } from "@material-ui/core";
 import { useUser } from "../contexts/UserContext";
+import CloseDialog from "./CloseDialog";
 
 export default function TicketPage() {
-  const { state } = useLocation();
+  const { id } = useParams();
   const [ticket, setTicket] = useState({});
   const [response, setResponse] = useState("");
   const [comments, setComments] = useState([]);
@@ -33,22 +34,7 @@ export default function TicketPage() {
       setResponse("");
       setComments((prev) => [...prev, res.data]);
     } catch (err) {
-      console.error(err);
-    }
-  }
-
-  async function handleChangeIssueStatus(status) {
-    try {
-      await axios.patch(
-        `/api/ticket/${ticket.id}`,
-        {
-          status: status,
-        },
-        { withCredentials: true }
-      );
-      setTicket((prev) => ({ ...prev, status: status }));
-      setResponse("");
-    } catch (err) {
+      console.error(err.response.data.message);
       console.error(err);
     }
   }
@@ -56,7 +42,7 @@ export default function TicketPage() {
   useEffect(() => {
     async function getTicketData() {
       try {
-        const res = await axios.get(`/api/ticket/${state.ticketId}`, {
+        const res = await axios.get(`/api/ticket/${id}`, {
           withCredentials: true,
         });
         // console.log(res);
@@ -74,57 +60,7 @@ export default function TicketPage() {
       }
     }
     getTicketData();
-  }, [state.ticketId]);
-
-  let issueButton;
-  switch (ticket.status) {
-    case "open":
-      issueButton = (
-        <Button
-          onClick={() => {
-            if (currentUser.role === "admin")
-              return handleChangeIssueStatus("closedbyadmin");
-            return handleChangeIssueStatus("closed");
-          }}
-          variant="outlined"
-          startIcon={
-            <CheckCircleOutlineIcon style={{ color: "var(--error)" }} />
-          }
-        >
-          Close Issue
-        </Button>
-      );
-      break;
-    case "closed":
-      issueButton = (
-        <Button
-          onClick={() => handleChangeIssueStatus("open")}
-          variant="outlined"
-          startIcon={<ErrorOutlineIcon style={{ color: "var(--success)" }} />}
-        >
-          Re-open Issue
-        </Button>
-      );
-      break;
-    case "closedbyadmin":
-      if (currentUser.role === "admin") {
-        issueButton = (
-          <Button
-            onClick={() => handleChangeIssueStatus("open")}
-            variant="outlined"
-            startIcon={<ErrorOutlineIcon style={{ color: "var(--success)" }} />}
-          >
-            Re-open Issue
-          </Button>
-        );
-      } else {
-        issueButton = <span></span>;
-      }
-      break;
-    default:
-      issueButton = <span></span>;
-      break;
-  }
+  }, [id]);
 
   return (
     <div className="ticketPage">
@@ -143,7 +79,7 @@ export default function TicketPage() {
             </div>
           )}
           <p>{`${ticket.username} opened this issue on ${ticket.date}`}</p>
-          {issueButton}
+          <CloseDialog ticket={ticket} setTicket={setTicket} />
         </div>
       </div>
       <div className="ticketMain">
@@ -194,7 +130,7 @@ export default function TicketPage() {
                     </div>
                   </div>
                 );
-              } else if (comment.type === "update" && comment.text === "open") {
+              } else if (comment.type === "open") {
                 return (
                   <div
                     className={`ticketContent ${
@@ -238,7 +174,7 @@ export default function TicketPage() {
                         year: "numeric",
                         month: "short",
                         day: "numeric",
-                      })}`}</span>
+                      })}: ${comment.text}`}</span>
                     </div>
                   </div>
                 );

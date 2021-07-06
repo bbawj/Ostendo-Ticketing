@@ -87,8 +87,8 @@ export default function Signup() {
               withCredentials: true,
             });
             setCurrentUser({ id: res.data.id, role: res.data.role });
-            history.push(res.data.redirectUrl);
             setSubmitting(false);
+            history.push(res.data.redirectUrl);
           } catch (err) {
             setError(err.response.data.message);
           }

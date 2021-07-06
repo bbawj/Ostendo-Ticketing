@@ -49,7 +49,7 @@ router.post("/", isAuth, async (req, res) => {
     return res.status(200).json({
       ...comment,
       type: "comment",
-      id: result.insertId,
+      id: result[0].insertId,
       email: req.user.email,
       created_date: Date.now(),
     });
