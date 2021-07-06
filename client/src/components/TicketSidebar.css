@@ -32,12 +32,14 @@
 }
 
 .label {
+  display: flex;
   padding: 0.25em 0.5em;
   color: white;
   background-color: var(--theme);
   margin: 0.5em 1em 0.5em 0;
   border-radius: 2em;
   font-size: 0.75rem;
+  align-items: center;
 }
 
 @media (max-width: 600px) {

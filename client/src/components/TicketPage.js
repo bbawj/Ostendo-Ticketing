@@ -16,7 +16,7 @@ export default function TicketPage() {
   const [response, setResponse] = useState("");
   const [comments, setComments] = useState([]);
   const { currentUser } = useUser();
-
+  //console.log(ticket);
   async function handleSubmitComment(e) {
     try {
       e.preventDefault();
@@ -210,7 +210,11 @@ export default function TicketPage() {
             </div>
           </div>
         </div>
-        <TicketSidebar id={ticket.id} label={ticket.label} />
+        <TicketSidebar
+          id={ticket.id}
+          label={ticket.label}
+          assign={ticket.assigned}
+        />
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ const updateSchema = Joi.object({
   label: Joi.number().integer(),
   conclusion: Joi.string().allow(""),
   method: Joi.string().valid("add", "delete"),
+  assignee: Joi.string(),
 });
 
 const filterSchema = Joi.object({
@@ -143,7 +144,7 @@ router.get("/:ticketId", isAuth, async (req, res) => {
   }
   try {
     const [ticketData] = await pool.query(
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as label FROM tickets as t JOIN users as u ON t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.id = ?",
+      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as label, users.email as assigned FROM tickets as t JOIN users as u ON t.owner_id=u.id LEFT JOIN users ON t.assigned_id=users.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.id = ?",
       [req.params.ticketId]
     );
     const [commentData] = await pool.query(
@@ -211,6 +212,37 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
       return res
         .status(200)
         .json({ message: "Successfully updated ticket label" });
+    } else if (req.body.assignee) {
+      // change assigned_id of ticket
+      const [rows] = await pool.query(
+        "SELECT * FROM users WHERE email = ?",
+        req.body.assignee
+      );
+      if (rows.length === 0)
+        return res.status(400).json({ message: "No user with that email" });
+      await pool.query("UPDATE tickets SET assigned_id = ? WHERE id = ?", [
+        rows[0].id,
+        req.params.ticketId,
+      ]);
+      //notify new assignee
+      const url =
+        process.env.NODE_ENV === "production"
+          ? `http://128.199.72.149/ticket/${req.params.ticketId}`
+          : `http://localhost:3000/ticket/${req.params.ticketId}`;
+      const output = `
+      <h3>You have been assigned a new issue on Ostendo Ticketing:</h3>
+      <a href="${url}">View new issue</a>
+      `;
+      transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: req.body.assignee,
+        subject: "New Issue Assigned",
+        html: output,
+      });
+
+      return res
+        .status(200)
+        .json({ message: "Successfully updated ticket assignee" });
     }
   } catch (error) {
     return res.status(500).json({ message: error });
