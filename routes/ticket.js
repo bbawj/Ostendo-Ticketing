@@ -15,6 +15,7 @@ const updateSchema = Joi.object({
   conclusion: Joi.string().allow(""),
   method: Joi.string().valid("add", "delete"),
   assignee: Joi.string(),
+  email: Joi.string(),
 });
 
 const filterSchema = Joi.object({
@@ -49,7 +50,7 @@ router.post("/admin", isAdmin, async (req, res) => {
       queryArr.push(req.body.start);
     }
     if (req.body.end) {
-      queryString = queryString + " t.created_date <= ? AND";
+      queryString = queryString + " t.created_date < ? AND";
       queryArr.push(req.body.end);
     }
     if (req.body.company) {
@@ -172,6 +173,11 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
     if (rows.length === 0)
       return res.status(404).json({ message: "Ticket not found" });
     // update status only
+    //set emil urls
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `http://128.199.72.149/ticket/${req.params.ticketId}`
+        : `http://localhost:3000/ticket/${req.params.ticketId}`;
     if (req.body.status) {
       //update closed_date datetime if status is changed to close
       if (req.body.status === "open") {
@@ -193,6 +199,18 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
         text: req.body.status === "open" ? "" : req.body.conclusion,
       };
       await pool.query("INSERT INTO comments SET ?", statusComment);
+      // send email notifs
+      const statusOutput = req.body.status === "open" ? "open" : "closed";
+      const output = `
+      <h3>The status of ticket #${req.params.ticketId} has been changed to: ${statusOutput}</h3>
+      <a href="${url}">View updates</a>
+      `;
+      transporter.sendMail({
+        from: process.env.MAIL_USER,
+        to: req.body.email,
+        subject: `Status update for ticket #${req.params.ticketId}`,
+        html: output,
+      });
       return res
         .status(200)
         .json({ message: "Successfully updated ticket status" });
@@ -225,10 +243,6 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
         req.params.ticketId,
       ]);
       //notify new assignee
-      const url =
-        process.env.NODE_ENV === "production"
-          ? `http://128.199.72.149/ticket/${req.params.ticketId}`
-          : `http://localhost:3000/ticket/${req.params.ticketId}`;
       const output = `
       <h3>You have been assigned a new issue on Ostendo Ticketing:</h3>
       <a href="${url}">View new issue</a>

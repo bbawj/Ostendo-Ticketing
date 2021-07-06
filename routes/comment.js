@@ -26,25 +26,21 @@ router.post("/", isAuth, async (req, res) => {
       text: req.body.text,
     };
     const result = await pool.query("INSERT INTO comments SET ?", comment);
-
-    if (req.user.role === "admin") {
-      const url =
-        process.env.NODE_ENV === "production"
-          ? `http://128.199.72.149/ticket/${req.body.ticket_id}`
-          : `http://localhost:3000/ticket/${req.body.ticket_id}`;
-      const output = `
-      <p>${req.user.email.split("@")[0]} has replied to your issue</p>
+    // send email notifs
+    const url =
+      process.env.NODE_ENV === "production"
+        ? `http://128.199.72.149/ticket/${req.body.ticket_id}`
+        : `http://localhost:3000/ticket/${req.body.ticket_id}`;
+    const output = `
+      <h3>${req.user.email.split("@")[0]} has replied to your issue</h3>
       <a href="${url}">View your issue</a>
       `;
-      transporter.sendMail({
-        from: process.env.MAIL_USER,
-        to: req.body.email,
-        subject: `Issue #${req.body.ticket_id} ${req.body.title}`,
-        html: output,
-      });
-    } else {
-      //todo: email to admin when issuer replies
-    }
+    transporter.sendMail({
+      from: process.env.MAIL_USER,
+      to: req.body.email,
+      subject: `Issue #${req.body.ticket_id} ${req.body.title}`,
+      html: output,
+    });
 
     return res.status(200).json({
       ...comment,

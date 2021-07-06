@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { IconButton, Select, MenuItem } from "@material-ui/core";
-import AddIcon from "@material-ui/icons/Add";
+import PersonAddIcon from "@material-ui/icons/PersonAdd";
 
 export default function AssignSelect({ changeAssigned, assigned }) {
   const [open, setOpen] = useState(false);
@@ -10,7 +10,7 @@ export default function AssignSelect({ changeAssigned, assigned }) {
     <div className={`sidebarBoxHeader`}>
       <h3>Assigned to</h3>
       <IconButton onClick={() => setOpen(!open)}>
-        <AddIcon style={{ color: "var(--theme)" }} />
+        <PersonAddIcon style={{ color: "var(--theme)" }} />
       </IconButton>
       <Select
         MenuProps={{

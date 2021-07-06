@@ -127,9 +127,19 @@ export default function AdminHome() {
               // search database
               setSubmitting(true);
               setDisable(true);
-              const res = await axios.post("/api/ticket/admin", values, {
-                withCredentials: true,
-              });
+              const res = await axios.post(
+                "/api/ticket/admin",
+                {
+                  ...values,
+                  end: new Date(
+                    new Date(values.end).getTime() + 24 * 60 * 60 * 1000
+                  ),
+                }, //add 1 day because of date formatting
+                {
+                  withCredentials: true,
+                }
+              );
+              setLabelledTickets(res.data);
               setOpenTickets(
                 res.data.filter((ticket) => ticket.status === "open")
               );

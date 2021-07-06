@@ -23,6 +23,7 @@ export default function CloseDialog({ ticket, setTicket }) {
         {
           status: status,
           conclusion: conclusion,
+          email: currentUser.role === "admin" ? ticket.email : ticket.assigned,
         },
         { withCredentials: true }
       );
