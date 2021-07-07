@@ -1,7 +1,7 @@
 import React from "react";
 import Signup from "./Signup";
 import Header from "./Header";
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { BrowserRouter as Router } from "react-router-dom";
 import "./App.css";
 import Home from "./Home";
 import { createMuiTheme } from "@material-ui/core";
@@ -11,7 +11,8 @@ import { UserProvider } from "../contexts/UserContext";
 import TicketPage from "./TicketPage";
 import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
-import PrivateRoute from "./PrivateRoute";
+import PrivateRoute from "../Routes/PrivateRoute";
+import RedirectRoute from "../Routes/RedirectRoute";
 
 const THEME = createMuiTheme({
   typography: {
@@ -31,11 +32,11 @@ export default function App() {
         <Router>
           <UserProvider>
             <Header />
-            <Route exact path="/" component={Login} />
-            <Route exact path="/login" component={Login} />
-            <Route path="/signup" component={Signup} />
-            <Route path="/forgot-password" component={ForgotPassword} />
-            <Route path="/reset/:id/:token" component={ResetPassword} />
+            <RedirectRoute exact path="/" component={Login} />
+            <RedirectRoute exact path="/login" component={Login} />
+            <RedirectRoute path="/signup" component={Signup} />
+            <RedirectRoute path="/forgot-password" component={ForgotPassword} />
+            <RedirectRoute path="/reset/:id/:token" component={ResetPassword} />
             <PrivateRoute path="/home" component={Home} />
             <PrivateRoute path="/ticket/:id" component={TicketPage} />
           </UserProvider>

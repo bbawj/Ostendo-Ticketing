@@ -1,16 +1,16 @@
 function isAuth(req, res, next) {
-  if (req.isAuthenticated) {
+  if (req.isAuthenticated()) {
     next();
   } else {
-    return res.status(401).json({ message: "Unauthorized" });
+    res.status(401).json({ message: "Unauthorized" });
   }
 }
 
 function isAdmin(req, res, next) {
-  if (req.isAuthenticated && req.user.role === "admin") {
+  if (req.user && req.isAuthenticated() && req.user.role === "admin") {
     next();
   } else {
-    return res.status(401).json({ message: "Unauthorized: Not Admin" });
+    res.status(401).json({ message: "Unauthorized: Not Admin" });
   }
 }
 

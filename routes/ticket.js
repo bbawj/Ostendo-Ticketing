@@ -139,7 +139,11 @@ router.get("/:ticketId", isAuth, async (req, res) => {
     "SELECT owner_id FROM tickets where id = ?",
     req.params.ticketId
   );
-  if (req.user.role !== "admin" && rows[0].owner_id !== req.user.id) {
+  if (
+    !req.user ||
+    req.user.role !== "admin" ||
+    rows[0].owner_id !== req.user.id
+  ) {
     return res.status(403).json({ message: "Unauthorized" });
   }
   try {
@@ -259,7 +263,7 @@ router.patch("/:ticketId", isAuth, async (req, res) => {
   }
 });
 
-router.post("/export", isAuth, async (req, res) => {
+router.post("/export", isAdmin, async (req, res) => {
   // validate with export schema
   const { error } = exportSchema.validate(req.body);
   if (error) return res.status(400).send(error.details[0].message);
