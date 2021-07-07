@@ -8,20 +8,20 @@ const headerObj = {
   category: ["name", "count"],
   detail: [
     "id",
-    "owner_id",
+    "email",
+    "company",
     "assigned_id",
     "status",
     "title",
     "description",
     "created_date",
     "closed_date",
-    "email",
-    "company",
+    "conclusion",
     "label",
   ],
 };
 
-export default function ExportSelect({ start, end, data }) {
+export default function ExportSelect({ start, end }) {
   const [open, setOpen] = useState(false);
   const [exportType, setExportType] = useState("");
 
@@ -39,27 +39,21 @@ export default function ExportSelect({ start, end, data }) {
 
   async function handleExport(type) {
     try {
-      if (!start || !end || !data) {
+      if (!start || !end) {
         return alert("No data to export. Try searching for something first.");
       }
-      let info;
-      if (type !== "detail") {
-        const res = await axios.post(
-          "/api/ticket/export",
-          {
-            start: start,
-            end: new Date(new Date(end).getTime() + 24 * 60 * 60 * 1000),
-            type: type,
-          },
-          { withCredentials: true }
-        );
-        info = res.data.data;
-      } else {
-        info = data;
-      }
+      const res = await axios.post(
+        "/api/ticket/export",
+        {
+          start: start,
+          end: new Date(new Date(end).getTime() + 24 * 60 * 60 * 1000),
+          type: type,
+        },
+        { withCredentials: true }
+      );
       const csvRows = [];
       csvRows.push(headerObj[type].join(","));
-      for (const row of info) {
+      for (const row of res.data.data) {
         const values = headerObj[type].map((header) => {
           const escaped = ("" + row[header]).replace(/"/g, '\\"');
           return `"${escaped}"`;

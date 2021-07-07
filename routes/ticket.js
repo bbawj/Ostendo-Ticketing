@@ -23,10 +23,13 @@ const filterSchema = Joi.object({
   start: Joi.string().allow(""),
   end: Joi.string().allow(""),
   company: Joi.string().allow(""),
+  last: Joi.number().integer(),
+  status: Joi.array().items(Joi.string()),
+  order: Joi.string().valid("asc", "desc"),
 });
 
 const exportSchema = Joi.object({
-  type: Joi.string().valid("user", "category"),
+  type: Joi.string().valid("user", "category", "detail"),
   start: Joi.string().required(),
   end: Joi.string().required(),
 });
@@ -55,6 +58,17 @@ router.post("/admin", isAdmin, async (req, res) => {
       queryString = queryString + " t.created_date < ? AND";
       queryArr.push(req.body.end);
     }
+    if (req.body.last) {
+      queryString =
+        req.body.order === "asc"
+          ? queryString + " t.id > ? AND"
+          : queryString + " t.id < ? AND";
+      queryArr.push(req.body.last);
+    }
+    if (req.body.status) {
+      queryString = queryString + " t.status IN (?) AND";
+      queryArr.push(req.body.status);
+    }
     if (req.body.company) {
       queryString = queryString + " u.company = ?";
       queryArr.push(req.body.company);
@@ -66,29 +80,16 @@ router.post("/admin", isAdmin, async (req, res) => {
       queryString = queryString.slice(0, -5);
     }
     // add group by
-    queryString = queryString + " GROUP BY t.id";
-    // use queryArr as second arguement if non-null
-    if (queryArr.length === 0) {
-      const [rows] = await pool.query(
-        "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
-      );
-      return res.status(200).json(rows);
+    if (req.body.order === "asc") {
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 5";
     } else {
-      const [rows] = await pool.query(queryString, queryArr);
-      return res.status(200).json(rows);
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 5";
     }
-  } catch (err) {
-    return res.status(500).json({ message: err });
-  }
-});
 
-router.get("/admin", isAdmin, async (req, res) => {
-  try {
-    const [rows] = await pool.query(
-      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id GROUP BY t.id"
-    );
+    const [rows] = await pool.query(queryString, queryArr);
     return res.status(200).json(rows);
   } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: err });
   }
 });
@@ -276,6 +277,12 @@ router.post("/export", isAdmin, async (req, res) => {
   } else if (req.body.type === "category") {
     const [rows] = await pool.query(
       "SELECT l.name, COUNT(*) as count FROM tickets AS t JOIN tickets_labels as tl on t.owner_id=tl.ticket_id JOIN labels AS l on tl.label_id=l.id WHERE t.created_date >= ? AND t.created_date < ? GROUP BY l.name",
+      [req.body.start, req.body.end]
+    );
+    return res.status(200).json({ data: rows });
+  } else if (req.body.type === "detail") {
+    const [rows] = await pool.query(
+      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.created_date >= ? AND t.created_date < ? GROUP BY t.id ORDER BY t.id",
       [req.body.start, req.body.end]
     );
     return res.status(200).json({ data: rows });

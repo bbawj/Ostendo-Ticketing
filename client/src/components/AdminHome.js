@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useRef, useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
@@ -11,17 +11,21 @@ import {
   Select,
   MenuItem,
   FormControl,
+  CircularProgress,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
 import ArrowDownwardIcon from "@material-ui/icons/ArrowDownward";
 import ArrowUpwardIcon from "@material-ui/icons/ArrowUpward";
 import { Link } from "react-router-dom";
-import axios from "../axios";
 import { formatTimeAgo } from "./FormatTime";
 import LabelSelect from "./LabelSelect";
 import "./AdminHome.css";
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
 import ExportSelect from "./ExportSelect";
+import {
+  useOpenTicketSearch,
+  useClosedTicketSearch,
+} from "../hooks/useTicketSearch";
 
 const MySelect = ({ ...props }) => {
   const [field] = useField(props);
@@ -31,6 +35,7 @@ const MySelect = ({ ...props }) => {
       <Select variant="outlined" displayEmpty {...field}>
         <MenuItem value="">Company</MenuItem>
         <MenuItem value="GMP Recruitment">GMP</MenuItem>
+        <MenuItem value="Ostendo Asia">Ostendo</MenuItem>
       </Select>
     </FormControl>
   );
@@ -38,82 +43,67 @@ const MySelect = ({ ...props }) => {
 
 export default function AdminHome() {
   const [value, setValue] = useState(0);
-  const [openTickets, setOpenTickets] = useState([]);
-  const [closedTickets, setClosedTickets] = useState([]);
-  const [sort, setSort] = useState(1);
+  const [order, setSort] = useState("asc");
   const [labels, setLabels] = useState([]);
-  const [labelledTickets, setLabelledTickets] = useState([]);
-  const [disable, setDisable] = useState(false);
   const formRef = useRef();
+  const [query, setQuery] = useState({});
+  const [openId, setOpenId] = useState(0);
+  const [closedId, setClosedId] = useState(0);
+  const openObserver = useRef();
+  const closedObserver = useRef();
+  const { openTickets, hasMore, loading, error } = useOpenTicketSearch(
+    query,
+    openId,
+    order
+  );
+  const { closedTickets, cHasMore, cLoading, cError } = useClosedTicketSearch(
+    query,
+    closedId,
+    order
+  );
+  // observer to check when user has scrolled to last item
+  const lastOpenTicket = useCallback(
+    (node, id) => {
+      if (loading) return;
+      if (openObserver.current) openObserver.current.disconnect();
+      openObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && hasMore) {
+          setOpenId(id);
+        }
+      });
+      if (node) openObserver.current.observe(node);
+    },
+    [loading, hasMore]
+  );
+
+  const lastClosedTicket = useCallback(
+    (node, id) => {
+      console.log(id);
+      if (cLoading) return;
+      if (closedObserver.current) closedObserver.current.disconnect();
+      closedObserver.current = new IntersectionObserver((entries) => {
+        if (entries[0].isIntersecting && cHasMore) {
+          setClosedId(id);
+        }
+      });
+      if (node) closedObserver.current.observe(node);
+    },
+    [cLoading, cHasMore]
+  );
 
   function addLabel(e) {
     setLabels(e.target.value);
-    setOpenTickets(
-      labelledTickets.filter((ticket) => {
-        if (ticket.status === "open") {
-          if (e.target.value.length === 0) return true;
-          return e.target.value.some((label) => {
-            if (ticket.label && ticket.label.split(",").includes(label)) {
-              return true;
-            }
-            return false;
-          });
-        }
-        return false;
-      })
-    );
-    setClosedTickets(
-      labelledTickets.filter((ticket) => {
-        if (ticket.status === "closed" || ticket.status === "closedbyadmin") {
-          if (e.target.value.length === 0) return true;
-          return e.target.value.some((label) => {
-            if (ticket.label && ticket.label.split(",").includes(label)) {
-              return true;
-            }
-            return false;
-          });
-        }
-        return false;
-      })
-    );
   }
 
   function handleSort() {
-    if (sort) {
-      setOpenTickets((prev) =>
-        prev.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
-      );
-      setClosedTickets((prev) =>
-        prev.sort((a, b) => new Date(b.created_date) - new Date(a.created_date))
-      );
-      setSort((prev) => !prev);
+    if (order === "asc") {
+      setSort("desc");
     } else {
-      setOpenTickets((prev) =>
-        prev.sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
-      );
-      setClosedTickets((prev) =>
-        prev.sort((a, b) => new Date(a.created_date) - new Date(b.created_date))
-      );
-      setSort((prev) => !prev);
+      setSort("asc");
     }
+    setOpenId(0);
+    setClosedId(0);
   }
-
-  useEffect(() => {
-    async function getTickets() {
-      const res = await axios.get("/api/ticket/admin", {
-        withCredentials: true,
-      });
-      setLabelledTickets(res.data);
-      setOpenTickets(res.data.filter((ticket) => ticket.status === "open"));
-      setClosedTickets(
-        res.data.filter(
-          (ticket) =>
-            ticket.status === "closed" || ticket.status === "closedbyadmin"
-        )
-      );
-    }
-    getTickets();
-  }, []);
 
   return (
     <div className="adminHome">
@@ -122,37 +112,15 @@ export default function AdminHome() {
         <Formik
           initialValues={{ text: "", company: "", start: "", end: "" }}
           innerRef={formRef}
-          onSubmit={async (values, { setSubmitting }) => {
+          onSubmit={(values, { setSubmitting }) => {
             try {
-              // search database
+              //create a shallow copy of values object to change equality by reference: trigger useEffect hook
+              let valuesCopy;
+              valuesCopy = { ...values };
               setSubmitting(true);
-              setDisable(true);
-              const res = await axios.post(
-                "/api/ticket/admin",
-                {
-                  ...values,
-                  end: new Date(
-                    new Date(values.end).getTime() + 24 * 60 * 60 * 1000
-                  ),
-                }, //add 1 day because of date formatting
-                {
-                  withCredentials: true,
-                }
-              );
-              setLabelledTickets(res.data);
-              setOpenTickets(
-                res.data.filter((ticket) => ticket.status === "open")
-              );
-              setClosedTickets(
-                res.data.filter(
-                  (ticket) =>
-                    ticket.status === "closed" ||
-                    ticket.status === "closedbyadmin"
-                )
-              );
-              setLabels([]);
-              setSort(1);
-              setDisable(false);
+              setOpenId(0);
+              setClosedId(0);
+              setQuery(valuesCopy);
               setSubmitting(false);
             } catch (err) {
               // console.log(err.response.data);
@@ -160,39 +128,41 @@ export default function AdminHome() {
             }
           }}
         >
-          <Form>
-            <div className="searchHalf">
-              <Field
-                name="text"
-                as={TextField}
-                variant="outlined"
-                fullWidth
-                placeholder="Search tickets"
-              />
-            </div>
-            <div className="searchHalf">
-              <Field
-                className="searchField"
-                InputLabelProps={{ shrink: true }}
-                as={TextField}
-                name="start"
-                label="Start"
-                type="date"
-              />
-              <Field
-                className="searchField"
-                as={TextField}
-                name="end"
-                label="End"
-                InputLabelProps={{ shrink: true }}
-                type="date"
-              />
-              <Field as={MySelect} name="company" />
-              <IconButton type="submit" disabled={disable}>
-                <SearchIcon />
-              </IconButton>
-            </div>
-          </Form>
+          {({ isSubmitting }) => (
+            <Form>
+              <div className="searchHalf">
+                <Field
+                  name="text"
+                  as={TextField}
+                  variant="outlined"
+                  fullWidth
+                  placeholder="Search tickets"
+                />
+              </div>
+              <div className="searchHalf">
+                <Field
+                  className="searchField"
+                  InputLabelProps={{ shrink: true }}
+                  as={TextField}
+                  name="start"
+                  label="Start"
+                  type="date"
+                />
+                <Field
+                  className="searchField"
+                  as={TextField}
+                  name="end"
+                  label="End"
+                  InputLabelProps={{ shrink: true }}
+                  type="date"
+                />
+                <Field as={MySelect} name="company" />
+                <IconButton type="submit" disabled={isSubmitting}>
+                  <SearchIcon />
+                </IconButton>
+              </div>
+            </Form>
+          )}
         </Formik>
       </div>
       <div className="tabsPanel">
@@ -223,7 +193,9 @@ export default function AdminHome() {
           />
           <Button
             onClick={handleSort}
-            endIcon={sort ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />}
+            endIcon={
+              order === "asc" ? <ArrowUpwardIcon /> : <ArrowDownwardIcon />
+            }
           >
             Sort By
           </Button>
@@ -231,68 +203,115 @@ export default function AdminHome() {
             <ExportSelect
               start={formRef.current.values.start}
               end={formRef.current.values.end}
-              data={labelledTickets}
             />
           )}
         </div>
       </div>
       <div className="ticketTable" value={value} hidden={value !== 0}>
-        {!(openTickets.length === 0) ? (
-          openTickets.map((ticket) => (
-            <Link
-              key={ticket.id}
-              to={{
-                pathname: `/ticket/${ticket.id}`,
-              }}
-            >
-              <div className="ticket">
-                <span className="listTicketHeader">
-                  <h3>{ticket.title} </h3>
-                  {ticket.label &&
-                    ticket.label.split(",").map((label) => (
-                      <span key={label} className="label">
-                        {label}
-                      </span>
-                    ))}
-                </span>
-                <p>{`#${ticket.id} opened ${formatTimeAgo(
-                  ticket.created_date
-                )} by ${ticket.email}, ${ticket.company}`}</p>
-              </div>
-            </Link>
-          ))
+        {openTickets && !(openTickets.length === 0) ? (
+          openTickets
+            .filter((ticket) => {
+              if (labels.length === 0) return true;
+              return labels.some((label) => {
+                if (ticket.label && ticket.label.split(",").includes(label)) {
+                  return true;
+                }
+                return false;
+              });
+            })
+            .map((ticket, idx) => (
+              <Link
+                ref={
+                  openTickets.length === idx + 1
+                    ? (node) => lastOpenTicket(node, ticket.id)
+                    : null
+                }
+                key={ticket.id}
+                to={{
+                  pathname: `/ticket/${ticket.id}`,
+                }}
+              >
+                <div className="ticket">
+                  <span className="listTicketHeader">
+                    <h3>{ticket.title} </h3>
+                    {ticket.label &&
+                      ticket.label.split(",").map((label) => (
+                        <span key={label} className="label">
+                          {label}
+                        </span>
+                      ))}
+                  </span>
+                  <p>{`#${ticket.id} opened ${formatTimeAgo(
+                    ticket.created_date
+                  )} by ${ticket.email}, ${ticket.company}`}</p>
+                </div>
+              </Link>
+            ))
         ) : (
           <h3>No open tickets. Try searching something else.</h3>
         )}
+        <div>{loading && <CircularProgress />}</div>
+        <div>
+          {error && (
+            <p>
+              There was an error fetching data from the server. Please try
+              refreshing.
+            </p>
+          )}
+        </div>
       </div>
       <div className="ticketTable" value={value} hidden={value !== 1}>
-        {!(closedTickets.length === 0) ? (
-          closedTickets.map((ticket) => (
-            <Link
-              key={ticket.id}
-              to={{
-                pathname: `/ticket/${ticket.id}`,
-              }}
-            >
-              <div className="ticket">
-                <span className="listTicketHeader">
-                  <h3>{ticket.title} </h3>
-                  {ticket.label &&
-                    ticket.label.split(",").map((label) => (
-                      <span key={label} className="label">
-                        {label}
-                      </span>
-                    ))}
-                </span>
-                <p>{`#${ticket.id} opened ${formatTimeAgo(
-                  ticket.created_date
-                )} by ${ticket.email}`}</p>
-              </div>
-            </Link>
-          ))
+        {closedTickets && !(closedTickets.length === 0) ? (
+          closedTickets
+            .filter((ticket) => {
+              if (labels.length === 0) return true;
+              return labels.some((label) => {
+                if (ticket.label && ticket.label.split(",").includes(label)) {
+                  return true;
+                }
+                return false;
+              });
+            })
+            .map((ticket, idx) => (
+              <Link
+                ref={
+                  closedTickets.length === idx + 1
+                    ? (node) => lastClosedTicket(node, ticket.id)
+                    : null
+                }
+                key={ticket.id}
+                to={{
+                  pathname: `/ticket/${ticket.id}`,
+                }}
+              >
+                <div className="ticket">
+                  <span className="listTicketHeader">
+                    <h3>{ticket.title} </h3>
+                    {ticket.label &&
+                      ticket.label.split(",").map((label) => (
+                        <span key={label} className="label">
+                          {label}
+                        </span>
+                      ))}
+                  </span>
+                  <p>{`#${ticket.id} opened ${formatTimeAgo(
+                    ticket.created_date
+                  )} by ${ticket.email}`}</p>
+                </div>
+              </Link>
+            ))
         ) : (
           <h3>No closed tickets. Try searching something else.</h3>
         )}
+        <div>{cLoading && <CircularProgress />}</div>
+        <div>
+          {cError && (
+            <p>
+              There was an error fetching data from the server. Please try
+              refreshing.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
