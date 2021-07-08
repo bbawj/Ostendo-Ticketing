@@ -1,0 +1,12 @@
+.home > h2 {
+  padding: 1em 0;
+}
+
+.addUserBox {
+  display: flex;
+  margin: 0 1em;
+  align-items: center;
+}
+.addUserBox > p {
+  padding: 0;
+}

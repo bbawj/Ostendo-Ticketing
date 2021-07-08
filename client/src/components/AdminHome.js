@@ -78,7 +78,6 @@ export default function AdminHome() {
 
   const lastClosedTicket = useCallback(
     (node, id) => {
-      console.log(id);
       if (cLoading) return;
       if (closedObserver.current) closedObserver.current.disconnect();
       closedObserver.current = new IntersectionObserver((entries) => {
@@ -107,7 +106,12 @@ export default function AdminHome() {
 
   return (
     <div className="adminHome">
-      <h2>Admin Dashboard</h2>
+      <div className="adminHomeHeader">
+        <h2>Dashboard</h2>
+        <Button>
+          <Link to="/admin">Admin Panel</Link>
+        </Button>
+      </div>
       <div className="searchContainer">
         <Formik
           initialValues={{ text: "", company: "", start: "", end: "" }}

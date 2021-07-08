@@ -4,8 +4,9 @@ import { TextField, Button, Snackbar, Collapse } from "@material-ui/core";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
 import axios from "../axios";
 import Alert from "@material-ui/lab/Alert";
+import AddUserDialog from "./AddUserDialog";
 
-export default function CreateTicket() {
+export default function CreateTicket({ admin }) {
   const [expanded, setExpanded] = useState(false);
   const [info, setInfo] = useState({ title: "", description: "" });
   const [open, setOpen] = useState(false);
@@ -63,17 +64,20 @@ export default function CreateTicket() {
         <ConfirmationNumberIcon />
       </div>
       <form onSubmit={handleCreateTicket}>
-        <TextField
-          value={info.title}
-          required
-          style={{ width: "50%" }}
-          onFocus={() => setExpanded(true)}
-          label="Title"
-          variant="outlined"
-          onChange={(e) =>
-            setInfo((prev) => ({ ...prev, title: e.target.value }))
-          }
-        />
+        <div className="createTicketTitle">
+          <TextField
+            value={info.title}
+            required
+            style={{ width: "50%" }}
+            onFocus={() => setExpanded(true)}
+            label="Title"
+            variant="outlined"
+            onChange={(e) =>
+              setInfo((prev) => ({ ...prev, title: e.target.value }))
+            }
+          />
+          {admin && <AddUserDialog info={info} setInfo={setInfo} />}
+        </div>
         <Collapse in={expanded}>
           <TextField
             value={info.description}

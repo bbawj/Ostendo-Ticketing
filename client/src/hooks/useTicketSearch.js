@@ -1,4 +1,4 @@
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "../axios";
 import baseaxios from "axios";
 
@@ -14,8 +14,8 @@ export function useOpenTicketSearch(query, openId, order) {
     setOpenTickets([]);
   }, [query, order]);
 
+  // when query/openId/order changes, refetch data
   useEffect(() => {
-    // console.log("requested Open");
     let cancel;
     async function getOpenTickets() {
       try {
@@ -67,7 +67,6 @@ export function useClosedTicketSearch(query, closedId, order) {
     let cancel;
     async function getClosedTickets() {
       try {
-        // console.log("requestedClosed");
         setCLoading(true);
         setError(false);
         const res = await axios.post(

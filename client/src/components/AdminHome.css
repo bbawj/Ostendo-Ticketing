@@ -2,8 +2,9 @@
   width: 100%;
 }
 
-.adminHome > h2 {
-  padding: 1em 0;
+.adminHomeHeader {
+  display: flex;
+  margin-top: 1em;
 }
 
 .searchContainer > form {

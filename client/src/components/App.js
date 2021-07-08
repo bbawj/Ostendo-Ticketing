@@ -13,6 +13,7 @@ import ForgotPassword from "./ForgotPassword";
 import ResetPassword from "./ResetPassword";
 import PrivateRoute from "../Routes/PrivateRoute";
 import RedirectRoute from "../Routes/RedirectRoute";
+import AdminPanel from "./AdminPanel";
 
 const THEME = createMuiTheme({
   typography: {
@@ -38,6 +39,7 @@ export default function App() {
             <RedirectRoute path="/forgot-password" component={ForgotPassword} />
             <RedirectRoute path="/reset/:id/:token" component={ResetPassword} />
             <PrivateRoute path="/home" component={Home} />
+            <PrivateRoute path="/admin" component={AdminPanel} />
             <PrivateRoute path="/ticket/:id" component={TicketPage} />
           </UserProvider>
         </Router>
