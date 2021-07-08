@@ -62,9 +62,11 @@ app.use(passport.session());
 const ticketRoute = require("./routes/ticket");
 const commentRoute = require("./routes/comment");
 const authRoute = require("./routes/auth");
+const userRoute = require("./routes/user");
 app.use("/api/ticket", ticketRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/auth", authRoute);
+app.use("/api/user", userRoute);
 
 // Serve static assets if in production
 if (process.env.NODE_ENV === "production") {
