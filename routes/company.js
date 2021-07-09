@@ -27,7 +27,7 @@ router.post("/", isAdmin, async (req, res) => {
       req.body.name
     );
     if (rows.length !== 0)
-      return res.status(404).json({ message: "Company already exists" });
+      return res.status(400).json({ message: "Company already exists" });
     const result = await pool.query(
       "INSERT INTO companies SET name = ?",
       req.body.name

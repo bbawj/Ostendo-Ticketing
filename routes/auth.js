@@ -28,7 +28,7 @@ router.post("/register", async (req, res) => {
       req.body.email,
     ]);
     if (rows.length !== 0)
-      return res.status(404).send({ message: "User already registered" });
+      return res.status(400).send({ message: "User already registered" });
     //create user
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
     const newUser = {
@@ -69,7 +69,7 @@ router.post("/forgot-password", async (req, res) => {
     ]);
     // check if user exists
     if (rows.length === 0)
-      return res.status(404).json({ message: "Invalid email" });
+      return res.status(400).json({ message: "Invalid email" });
     const userId = rows[0].id;
     jwt.sign(
       { id: userId },
@@ -107,7 +107,7 @@ router.post("/reset-password/:id/:token", async (req, res) => {
       req.params.id
     );
     if (rows.length === 0)
-      return res.status(404).send({ message: "User not found" });
+      return res.status(400).send({ message: "User not found" });
 
     const { id } = jwt.verify(
       req.params.token,
