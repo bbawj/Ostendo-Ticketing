@@ -108,7 +108,7 @@ export default function AdminHome() {
     <div className="adminHome">
       <div className="adminHomeHeader">
         <h2>Dashboard</h2>
-        <Button>
+        <Button variant="outlined" color="primary">
           <Link to="/admin">Admin Panel</Link>
         </Button>
       </div>

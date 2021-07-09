@@ -82,7 +82,7 @@ export default function CloseDialog({ ticket, setTicket }) {
   }
 
   return (
-    <div style={{ marginLeft: "auto" }}>
+    <div className="closeDialog">
       {issueButton}
       <Dialog
         open={open}

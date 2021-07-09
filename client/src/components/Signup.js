@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "./Signup.css";
 import { Formik, Field, Form, useField } from "formik";
 import * as Yup from "yup";
@@ -35,15 +35,31 @@ const MyTextField = ({ label, type, ...props }) => {
 
 const MySelectField = ({ label, ...props }) => {
   const [field, meta] = useField(props);
+  const [companies, setCompanies] = useState([]);
   const errorText = meta.error && meta.touched ? meta.error : "";
+
+  useEffect(() => {
+    async function getCompanies() {
+      try {
+        const res = await axios.get("/api/company", { withCredentials: true });
+        setCompanies(res.data);
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    getCompanies();
+  }, []);
 
   return (
     <FormControl className="formFields">
       <InputLabel id={label}>{label}</InputLabel>
       <Select style={{ width: "100%" }} {...field} labelId={label}>
         <MenuItem value="">Company</MenuItem>
-        <MenuItem value="Ostendo Asia">Ostendo Asia</MenuItem>
-        <MenuItem value="GMP Recruitment">GMP Recruitment</MenuItem>
+        {companies.map((company) => (
+          <MenuItem key={company.id} value={company.id}>
+            {company.name}
+          </MenuItem>
+        ))}
       </Select>
       <FormHelperText error={!!errorText}>{errorText}</FormHelperText>
     </FormControl>
@@ -72,7 +88,7 @@ export default function Signup() {
           email: Yup.string()
             .email("Invalid email address")
             .required("Required"),
-          company: Yup.string().required(),
+          company: Yup.number("Required").integer().required("Required"),
           password: Yup.string().required("Required"),
           passwordConfirm: Yup.string().oneOf(
             [Yup.ref("password"), null],

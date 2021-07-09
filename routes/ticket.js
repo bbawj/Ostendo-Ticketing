@@ -7,6 +7,8 @@ const transporter = require("../config/mail");
 const schema = Joi.object({
   title: Joi.string().required(),
   description: Joi.string().required(),
+  owner_id: Joi.number().integer(),
+  assigned_id: Joi.number().integer(),
 });
 
 const updateSchema = Joi.object({
@@ -41,7 +43,7 @@ router.post("/admin", isAdmin, async (req, res) => {
   if (error) return res.status(400).json(error.details[0].message);
   try {
     let queryString =
-      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
+      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
     let queryArr = [];
     //build the query string
     if (req.body.text) {
@@ -282,7 +284,7 @@ router.post("/export", isAdmin, async (req, res) => {
     return res.status(200).json({ data: rows });
   } else if (req.body.type === "detail") {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email, u.company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.created_date >= ? AND t.created_date < ? GROUP BY t.id ORDER BY t.id",
+      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.created_date >= ? AND t.created_date < ? GROUP BY t.id ORDER BY t.id",
       [req.body.start, req.body.end]
     );
     return res.status(200).json({ data: rows });

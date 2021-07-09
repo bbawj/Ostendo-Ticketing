@@ -53,14 +53,16 @@
   margin-top: 1em;
   align-items: center;
   width: 100%;
+  flex-wrap: wrap;
 }
 
 .ticketSubheader > p {
   margin-left: 0.5em;
+  margin-right: auto;
 }
 
-.ticketSubheader > .MuiButton-root {
-  margin-left: auto;
+.closeDialog {
+  padding-top: 1em;
 }
 
 .ticketStatus {
@@ -144,9 +146,6 @@
 }
 
 @media (max-width: 600px) {
-  .ticketSubheader > .MuiButton-root {
-    font-size: 0;
-  }
   .ticketHeader > h1 {
     font-size: 1.5rem;
   }

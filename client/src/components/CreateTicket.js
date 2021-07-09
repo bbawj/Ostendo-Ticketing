@@ -15,7 +15,16 @@ export default function CreateTicket({ admin }) {
   async function handleCreateTicket(e) {
     e.preventDefault();
     try {
-      await axios.post("/api/ticket", info, { withCredentials: true });
+      await axios.post(
+        "/api/ticket",
+        {
+          title: info.title,
+          description: info.description,
+          assigned_id: info.assigned_id,
+          owner_id: info.owner_id,
+        },
+        { withCredentials: true }
+      );
       setInfo({ title: "", description: "" });
       setOpen(true);
     } catch (err) {
@@ -60,7 +69,7 @@ export default function CreateTicket({ admin }) {
         </Alert>
       </Snackbar>
       <div className="ticketCreateHeader">
-        <h2>Create a ticket</h2>
+        <h3>Create a ticket</h3>
         <ConfirmationNumberIcon />
       </div>
       <form onSubmit={handleCreateTicket}>
@@ -68,7 +77,6 @@ export default function CreateTicket({ admin }) {
           <TextField
             value={info.title}
             required
-            style={{ width: "50%" }}
             onFocus={() => setExpanded(true)}
             label="Title"
             variant="outlined"
@@ -86,13 +94,13 @@ export default function CreateTicket({ admin }) {
             placeholder="Description"
             multiline
             variant="filled"
-            inputProps={{ maxLength: 140, rows: 3, cols: 50 }}
+            inputProps={{ rows: 3, cols: 50 }}
             InputProps={{ disableUnderline: true }}
             onChange={(e) =>
               setInfo((prev) => ({ ...prev, description: e.target.value }))
             }
           />
-          <Button type="submit" variant="contained">
+          <Button type="submit" color="primary" variant="contained">
             Submit Ticket
           </Button>
         </Collapse>

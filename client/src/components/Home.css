@@ -18,7 +18,10 @@
 .createTicketTitle {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+}
+
+.createTicketTitle > .MuiTextField-root {
+  width: 50%;
 }
 
 .ticketCreateHeader {
@@ -41,11 +44,6 @@
   margin: 0.5em 0;
 }
 
-.createTicket .MuiButton-root {
-  background-color: var(--theme);
-  color: white;
-}
-
 .myTickets {
   width: 100%;
 }
@@ -56,5 +54,15 @@
 @media (max-width: 1250px) {
   .home {
     margin: 1em 1em;
+  }
+}
+
+@media (max-width: 600px) {
+  .createTicketTitle {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .createTicketTitle > .MuiTextField-root {
+    width: 100%;
   }
 }

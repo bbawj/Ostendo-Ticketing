@@ -2,11 +2,44 @@
   padding: 1em 0;
 }
 
+.addUserDialog {
+  display: flex;
+}
+
 .addUserBox {
   display: flex;
   margin: 0 1em;
   align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
 }
 .addUserBox > p {
   padding: 0;
+  margin-left: 0.5em;
+}
+
+.addUserForm {
+  display: grid;
+  gap: 1em;
+  grid-template-columns: 1fr;
+}
+
+.addUserForm > .container {
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .addUserDialog {
+    flex-direction: column;
+  }
+  .addUserBox button {
+    /* font-size: 0; */
+  }
+  .addUserBox {
+    margin: 0.5em 0;
+  }
+  .addUserBox > p {
+    margin: 0;
+  }
 }

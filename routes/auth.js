@@ -7,12 +7,21 @@ const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const passport = require("passport");
 
+const registerSchema = Joi.object({
+  email: Joi.string().email().required(),
+  password: Joi.string().required(),
+  company: Joi.number().integer().required(),
+});
+
 const resetSchema = Joi.object({
   password: Joi.string().required(),
   passwordConfirm: Joi.string().required().valid(Joi.ref("password")),
 });
 
 router.post("/register", async (req, res) => {
+  //Joi validation
+  const { error } = registerSchema.validate(req.body);
+  if (error) return res.status(400).json(error.details[0].message);
   try {
     //check if email already registered
     const [rows] = await pool.execute("SELECT * FROM users WHERE email = ?", [

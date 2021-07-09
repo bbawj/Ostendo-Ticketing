@@ -41,7 +41,7 @@ export default function MyTickets() {
 
   return (
     <div className="myTickets">
-      <h2>My Tickets</h2>
+      <h3>My Tickets</h3>
       <Tabs
         indicatorColor="primary"
         value={value}
