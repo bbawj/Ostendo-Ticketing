@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Select, MenuItem, IconButton, Button } from "@material-ui/core";
-import MoreVertIcon from "@material-ui/icons/MoreVert";
+import ExitToAppIcon from "@material-ui/icons/ExitToApp";
 import axios from "../axios";
 
 const headerObj = {
@@ -70,7 +70,7 @@ export default function ExportSelect({ start, end }) {
   return (
     <div className="exportSelect">
       <IconButton onClick={() => setOpen(!open)} color="primary">
-        <MoreVertIcon />
+        <ExitToAppIcon />
       </IconButton>
       <Select
         MenuProps={{

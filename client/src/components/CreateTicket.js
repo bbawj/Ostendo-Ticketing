@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "./Home.css";
 import { TextField, Button, Snackbar, Collapse } from "@material-ui/core";
-import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
+import CreateIcon from "@material-ui/icons/Create";
 import axios from "../axios";
 import Alert from "@material-ui/lab/Alert";
 import AddUserDialog from "./AddUserDialog";
@@ -70,7 +70,7 @@ export default function CreateTicket({ admin }) {
       </Snackbar>
       <div className="ticketCreateHeader">
         <h3>Create a ticket</h3>
-        <ConfirmationNumberIcon />
+        <CreateIcon />
       </div>
       <form onSubmit={handleCreateTicket}>
         <div className="createTicketTitle">

@@ -63,11 +63,13 @@ const ticketRoute = require("./routes/ticket");
 const commentRoute = require("./routes/comment");
 const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
+const adminRoute = require("./routes/admin");
 const companyRoute = require("./routes/company");
 app.use("/api/ticket", ticketRoute);
 app.use("/api/comment", commentRoute);
 app.use("/api/auth", authRoute);
 app.use("/api/user", userRoute);
+app.use("/api/admin", adminRoute);
 app.use("/api/company", companyRoute);
 
 // Serve static assets if in production

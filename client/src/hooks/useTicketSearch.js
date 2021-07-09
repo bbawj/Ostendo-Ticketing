@@ -22,7 +22,7 @@ export function useOpenTicketSearch(query, openId, order) {
         setLoading(true);
         setError(false);
         const res = await axios.post(
-          "/api/ticket/admin",
+          "/api/admin",
           {
             ...query,
             end: query.end
@@ -70,7 +70,7 @@ export function useClosedTicketSearch(query, closedId, order) {
         setCLoading(true);
         setError(false);
         const res = await axios.post(
-          "/api/ticket/admin",
+          "/api/admin",
           {
             ...query,
             end: query.end

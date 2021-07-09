@@ -26,18 +26,14 @@
 
 .ticketCreateHeader {
   display: flex;
-  align-items: flex-end;
+  margin: 2em 0;
 }
-.ticketCreateHeader > h2 {
+.ticketCreateHeader > h3 {
   margin-right: 0.5em;
 }
 
 .ticketCreateHeader > .MuiSvgIcon-root {
   color: var(--theme);
-}
-
-.createTicket > form {
-  margin-top: 1em;
 }
 
 .createTicket .MuiInputBase-root {
@@ -46,8 +42,9 @@
 
 .myTickets {
   width: 100%;
+  margin: 1em 0;
 }
-.myTickets > h2 {
+.myTickets > h3 {
   margin: 1em 0;
 }
 

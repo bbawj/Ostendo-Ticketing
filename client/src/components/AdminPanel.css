@@ -33,9 +33,7 @@
   .addUserDialog {
     flex-direction: column;
   }
-  .addUserBox button {
-    /* font-size: 0; */
-  }
+
   .addUserBox {
     margin: 0.5em 0;
   }

@@ -143,6 +143,7 @@
   color: grey;
   margin-top: 2em;
   margin-left: 1em;
+  font-weight: 500;
 }
 
 @media (max-width: 600px) {

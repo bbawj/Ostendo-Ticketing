@@ -7,8 +7,9 @@ import axios from "../axios";
 import { formatTimeAgo } from "./FormatTime";
 import "./Ticket.css";
 import { Link } from "react-router-dom";
+import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
 
-export default function MyTickets() {
+export default function MyTickets({ admin }) {
   const [value, setValue] = useState(0);
   const [openTickets, setOpenTickets] = useState([]);
   const [closedTickets, setClosedTickets] = useState([]);
@@ -17,9 +18,16 @@ export default function MyTickets() {
     let isMounted = true;
     async function getMyTickets() {
       try {
-        const res = await axios.get(`/api/ticket/user`, {
-          withCredentials: true,
-        });
+        let res;
+        if (!admin) {
+          res = await axios.get(`/api/ticket/user`, {
+            withCredentials: true,
+          });
+        } else {
+          res = await axios.get(`/api/admin`, {
+            withCredentials: true,
+          });
+        }
         // set state only if mounted
         if (isMounted) {
           setOpenTickets(res.data.filter((el) => el.status === "open"));
@@ -37,11 +45,14 @@ export default function MyTickets() {
     return () => {
       isMounted = false;
     };
-  }, []);
+  }, [admin]);
 
   return (
     <div className="myTickets">
-      <h3>My Tickets</h3>
+      <div className="ticketCreateHeader">
+        {admin ? <h3>Assigned to me</h3> : <h3>My Tickets</h3>}
+        <ConfirmationNumberIcon />
+      </div>
       <Tabs
         indicatorColor="primary"
         value={value}
