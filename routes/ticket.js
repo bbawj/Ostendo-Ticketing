@@ -26,15 +26,70 @@ const exportSchema = Joi.object({
   end: Joi.string().required(),
 });
 
+const filterSchema = Joi.object({
+  text: Joi.string().allow(""),
+  company: Joi.string().allow(""),
+  start: Joi.string().allow(""),
+  end: Joi.string().allow(""),
+  last: Joi.number().integer(),
+  status: Joi.array().items(Joi.string()),
+  order: Joi.string().valid("asc", "desc"),
+});
+
 //get own tickets
 router.get("/user", isAuth, async (req, res) => {
+  //Joi validation
+  const { error } = filterSchema.validate(req.query);
+  if (error) return res.status(400).json(error.details[0].message);
   try {
-    const [data] = await pool.query(
-      "SELECT t.*, u.email, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id=u.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.owner_id = ? GROUP BY t.id",
-      [req.user.id]
-    );
-    return res.status(200).json(data);
+    let queryString =
+      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
+    let queryArr = [];
+    //build the query string
+    queryString = queryString + " t.owner_id = ? AND";
+    queryArr.push(req.user.id);
+    if (req.query.text) {
+      queryString =
+        queryString +
+        " MATCH(t.title, t.description) AGAINST (? in NATURAL LANGUAGE MODE) AND";
+      queryArr.push(req.query.text);
+    }
+    if (req.query.start) {
+      queryString = queryString + " t.created_date >= ? AND";
+      queryArr.push(req.query.start);
+    }
+    if (req.query.end) {
+      queryString = queryString + " t.created_date < ? AND";
+      queryArr.push(req.query.end);
+    }
+    if (req.query.last) {
+      queryString =
+        req.query.order === "asc"
+          ? queryString + " t.id > ? AND"
+          : queryString + " t.id < ? AND";
+      queryArr.push(req.query.last);
+    }
+    if (req.query.status) {
+      queryString = queryString + " t.status IN (?) AND";
+      queryArr.push(req.query.status);
+    }
+    //remove trailing "AND" or "WHERE"
+    if (queryString.slice(-3) === "AND") {
+      queryString = queryString.slice(0, -3);
+    } else if (queryString.slice(-5) === "WHERE") {
+      queryString = queryString.slice(0, -5);
+    }
+    // add group by
+    if (req.query.order === "asc") {
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 5";
+    } else {
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 5";
+    }
+
+    const [rows] = await pool.query(queryString, queryArr);
+    return res.status(200).json(rows);
   } catch (err) {
+    console.error(err);
     return res.status(500).json({ message: err });
   }
 });
@@ -74,8 +129,7 @@ router.get("/:ticketId", isAuth, async (req, res) => {
   );
   if (
     !req.user ||
-    req.user.role !== "admin" ||
-    rows[0].owner_id !== req.user.id
+    (req.user.role !== "admin" && rows[0].owner_id !== req.user.id)
   ) {
     return res.status(403).json({ message: "Unauthorized" });
   }

@@ -36,7 +36,7 @@ router.post("/", isAdmin, async (req, res) => {
     const user = {
       email: req.body.email,
       password: hashedPassword,
-      company: req.body.company,
+      company_id: req.body.company,
     };
     await pool.query("INSERT INTO users SET ?", user);
     return res.status(200).json({ message: "New user created" });

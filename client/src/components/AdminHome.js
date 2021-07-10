@@ -1,4 +1,4 @@
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
@@ -26,22 +26,34 @@ import {
   useOpenTicketSearch,
   useClosedTicketSearch,
 } from "../hooks/useTicketSearch";
+import axios from "../axios";
 
 const MySelect = ({ ...props }) => {
   const [field] = useField(props);
+  const [companies, setCompanies] = useState([]);
 
+  useEffect(() => {
+    async function getCompanies() {
+      const res = await axios.get("/api/company", { withCredentials: true });
+      setCompanies(res.data);
+    }
+    getCompanies();
+  }, []);
   return (
     <FormControl style={{ width: "25%" }}>
       <Select variant="outlined" displayEmpty {...field}>
         <MenuItem value="">Company</MenuItem>
-        <MenuItem value="GMP Recruitment">GMP</MenuItem>
-        <MenuItem value="Ostendo Asia">Ostendo</MenuItem>
+        {companies.map((c) => (
+          <MenuItem value={c.id} key={c.id}>
+            {c.name}
+          </MenuItem>
+        ))}
       </Select>
     </FormControl>
   );
 };
 
-export default function AdminHome() {
+export default function AdminHome({ type }) {
   const [value, setValue] = useState(0);
   const [order, setSort] = useState("asc");
   const [labels, setLabels] = useState([]);
@@ -52,18 +64,21 @@ export default function AdminHome() {
   const openObserver = useRef();
   const closedObserver = useRef();
   const { openTickets, hasMore, loading, error } = useOpenTicketSearch(
-    query,
     openId,
-    order
+    order,
+    type,
+    query
   );
   const { closedTickets, cHasMore, cLoading, cError } = useClosedTicketSearch(
-    query,
     closedId,
-    order
+    order,
+    type,
+    query
   );
   // observer to check when user has scrolled to last item
   const lastOpenTicket = useCallback(
     (node, id) => {
+      // console.log(id);
       if (loading) return;
       if (openObserver.current) openObserver.current.disconnect();
       openObserver.current = new IntersectionObserver((entries) => {
@@ -106,12 +121,6 @@ export default function AdminHome() {
 
   return (
     <div className="adminHome">
-      <div className="adminHomeHeader">
-        <h2>Dashboard</h2>
-        <Button variant="outlined" color="primary">
-          <Link to="/admin">Admin Panel</Link>
-        </Button>
-      </div>
       <div className="searchContainer">
         <Formik
           initialValues={{ text: "", company: "", start: "", end: "" }}
@@ -160,7 +169,9 @@ export default function AdminHome() {
                   InputLabelProps={{ shrink: true }}
                   type="date"
                 />
-                <Field as={MySelect} name="company" />
+                {(type === "all" || type === "assigned") && (
+                  <Field as={MySelect} name="company" />
+                )}
                 <IconButton type="submit" disabled={isSubmitting}>
                   <SearchIcon />
                 </IconButton>
@@ -203,7 +214,7 @@ export default function AdminHome() {
           >
             Sort By
           </Button>
-          {formRef.current && (
+          {type === "all" && formRef.current && (
             <ExportSelect
               start={formRef.current.values.start}
               end={formRef.current.values.end}
@@ -251,10 +262,14 @@ export default function AdminHome() {
                 </div>
               </Link>
             ))
+        ) : error || loading ? (
+          <span></span>
         ) : (
           <h3>No open tickets. Try searching something else.</h3>
         )}
-        <div>{loading && <CircularProgress />}</div>
+        <div>
+          {loading && <CircularProgress style={{ marginTop: "1em" }} />}
+        </div>
         <div>
           {error && (
             <p>

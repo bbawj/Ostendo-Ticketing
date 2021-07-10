@@ -8,17 +8,18 @@ const filterSchema = Joi.object({
   text: Joi.string().allow(""),
   start: Joi.string().allow(""),
   end: Joi.string().allow(""),
-  company: Joi.string().allow(""),
+  company: Joi.number().integer(),
   last: Joi.number().integer(),
   status: Joi.array().items(Joi.string()),
   order: Joi.string().valid("asc", "desc"),
+  user: Joi.number().integer(),
 });
 
 //get tickets assigned to a particular admin
 router.get("/", isAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.assigned_id = ? GROUP BY t.id",
+      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.assigned_id = ? GROUP BY t.id LIMIT 5",
       req.user.id
     );
     return res.status(200).json(rows);
@@ -37,6 +38,10 @@ router.post("/", isAdmin, async (req, res) => {
       "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE";
     let queryArr = [];
     //build the query string
+    if (req.body.user) {
+      queryString = queryString + " t.assigned_id = ? AND";
+      queryArr.push(req.user.id);
+    }
     if (req.body.text) {
       queryString =
         queryString +
@@ -63,7 +68,7 @@ router.post("/", isAdmin, async (req, res) => {
       queryArr.push(req.body.status);
     }
     if (req.body.company) {
-      queryString = queryString + " u.company = ?";
+      queryString = queryString + " u.company_id = ?";
       queryArr.push(req.body.company);
     }
     //remove trailing "AND" or "WHERE"

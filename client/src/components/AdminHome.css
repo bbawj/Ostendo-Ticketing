@@ -44,10 +44,8 @@ div.searchField {
 }
 .tabsPanel {
   display: flex;
-  width: 100%;
   border: 1px solid var(--accent2);
   background-color: var(--accent);
-  justify-content: space-between;
 }
 .tabsPanel .MuiTabs-root {
   flex-grow: 0.7;
@@ -58,8 +56,8 @@ div.searchField {
 }
 .tabsGroup {
   display: flex;
-  flex-grow: 0.2;
-  justify-content: center;
+  flex-grow: 0.3;
+  justify-content: space-evenly;
 }
 
 .listTicketHeader {

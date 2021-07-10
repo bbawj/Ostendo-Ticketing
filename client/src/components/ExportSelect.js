@@ -76,7 +76,7 @@ export default function ExportSelect({ start, end }) {
         MenuProps={{
           getContentAnchorEl: () => null,
         }}
-        style={{ visibility: "hidden", width: "0" }}
+        style={{ visibility: "hidden", width: "0", position: "absolute" }}
         open={open}
         value={exportType}
         onChange={(e) => setExportType(e.target.value)}
