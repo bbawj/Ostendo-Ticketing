@@ -3,14 +3,11 @@ import Tabs from "@material-ui/core/Tabs";
 import Tab from "@material-ui/core/Tab";
 import ErrorOutlineIcon from "@material-ui/icons/ErrorOutline";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import { Formik, Field, Form, useField } from "formik";
+import { Formik, Field, Form } from "formik";
 import {
   Button,
   IconButton,
   TextField,
-  Select,
-  MenuItem,
-  FormControl,
   CircularProgress,
 } from "@material-ui/core";
 import SearchIcon from "@material-ui/icons/Search";
@@ -27,36 +24,13 @@ import {
   useClosedTicketSearch,
 } from "../hooks/useTicketSearch";
 import axios from "../axios";
-
-const MySelect = ({ ...props }) => {
-  const [field] = useField(props);
-  const [companies, setCompanies] = useState([]);
-
-  useEffect(() => {
-    async function getCompanies() {
-      const res = await axios.get("/api/company", { withCredentials: true });
-      setCompanies(res.data);
-    }
-    getCompanies();
-  }, []);
-  return (
-    <FormControl style={{ width: "25%" }}>
-      <Select variant="outlined" displayEmpty {...field}>
-        <MenuItem value="">Company</MenuItem>
-        {companies.map((c) => (
-          <MenuItem value={c.id} key={c.id}>
-            {c.name}
-          </MenuItem>
-        ))}
-      </Select>
-    </FormControl>
-  );
-};
+import AutoComplete from "@material-ui/lab/Autocomplete";
 
 export default function AdminHome({ type }) {
   const [value, setValue] = useState(0);
   const [order, setSort] = useState("asc");
   const [labels, setLabels] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const formRef = useRef();
   const [query, setQuery] = useState({});
   const [openId, setOpenId] = useState(0);
@@ -119,6 +93,14 @@ export default function AdminHome({ type }) {
     setClosedId(0);
   }
 
+  useEffect(() => {
+    async function getCompanies() {
+      const res = await axios.get("/api/company", { withCredentials: true });
+      setCompanies(res.data);
+    }
+    getCompanies();
+  }, []);
+
   return (
     <div className="adminHome">
       <div className="searchContainer">
@@ -141,7 +123,7 @@ export default function AdminHome({ type }) {
             }
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, setFieldValue, initialValues }) => (
             <Form>
               <div className="searchHalf">
                 <Field
@@ -170,7 +152,27 @@ export default function AdminHome({ type }) {
                   type="date"
                 />
                 {(type === "all" || type === "assigned") && (
-                  <Field as={MySelect} name="company" />
+                  <AutoComplete
+                    id="company"
+                    name="company"
+                    options={companies}
+                    style={{ width: "50%" }}
+                    getOptionLabel={(option) => option.name}
+                    onChange={(e, value) => {
+                      //console.log(value);
+                      setFieldValue(
+                        "company",
+                        value !== null ? value.id : initialValues.company
+                      );
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        label="Company"
+                        variant="outlined"
+                      />
+                    )}
+                  />
                 )}
                 <IconButton type="submit" disabled={isSubmitting}>
                   <SearchIcon />

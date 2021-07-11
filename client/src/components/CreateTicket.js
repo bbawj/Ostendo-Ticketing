@@ -55,7 +55,7 @@ export default function CreateTicket({ admin }) {
         onClose={handleClose}
       >
         <Alert onClose={handleClose} severity="success">
-          Your ticket has been recorded!
+          Your ticket has been recorded! Refresh to view.
         </Alert>
       </Snackbar>
       <Snackbar
