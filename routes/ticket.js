@@ -81,9 +81,9 @@ router.get("/user", isAuth, async (req, res) => {
     }
     // add group by
     if (req.query.order === "asc") {
-      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 5";
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 10";
     } else {
-      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 5";
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 10";
     }
 
     const [rows] = await pool.query(queryString, queryArr);

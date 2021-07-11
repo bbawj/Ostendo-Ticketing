@@ -2,13 +2,12 @@ const router = require("express").Router();
 const pool = require("../config/db");
 const { isAdmin } = require("../authMiddleware");
 const Joi = require("joi");
-const transporter = require("../config/mail");
 
 const filterSchema = Joi.object({
   text: Joi.string().allow(""),
   start: Joi.string().allow(""),
   end: Joi.string().allow(""),
-  company: Joi.number().integer(),
+  company: Joi.number().integer().allow(""),
   last: Joi.number().integer(),
   status: Joi.array().items(Joi.string()),
   order: Joi.string().valid("asc", "desc"),
@@ -19,7 +18,7 @@ const filterSchema = Joi.object({
 router.get("/", isAdmin, async (req, res) => {
   try {
     const [rows] = await pool.query(
-      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.assigned_id = ? GROUP BY t.id LIMIT 5",
+      "SELECT t.*, u.email, c.name as company, GROUP_CONCAT(l.name) as label from tickets as t JOIN users as u on t.owner_id = u.id JOIN companies as c ON u.company_id = c.id LEFT JOIN tickets_labels as tl on tl.ticket_id = t.id LEFT JOIN labels as l on tl.label_id = l.id WHERE t.assigned_id = ? GROUP BY t.id LIMIT 10",
       req.user.id
     );
     return res.status(200).json(rows);
@@ -79,9 +78,9 @@ router.post("/", isAdmin, async (req, res) => {
     }
     // add group by
     if (req.body.order === "asc") {
-      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 5";
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id LIMIT 10";
     } else {
-      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 5";
+      queryString = queryString + " GROUP BY t.id ORDER BY t.id DESC LIMIT 10";
     }
 
     const [rows] = await pool.query(queryString, queryArr);
