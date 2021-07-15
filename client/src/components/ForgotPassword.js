@@ -64,7 +64,7 @@ export default function ForgotPassword() {
       >
         {({ isSubmitting, status }) =>
           status !== "done" && (
-            <Form>
+            <Form className="resetPassword">
               <div className="formFlex">
                 <Field
                   name="email"

@@ -26,7 +26,7 @@ import {
 import axios from "../axios";
 import AutoComplete from "@material-ui/lab/Autocomplete";
 
-export default function AdminHome({ type }) {
+export default function TicketList({ type }) {
   const [value, setValue] = useState(0);
   const [order, setSort] = useState("asc");
   const [labels, setLabels] = useState([]);
@@ -260,7 +260,11 @@ export default function AdminHome({ type }) {
                   </span>
                   <p>{`#${ticket.id} opened ${formatTimeAgo(
                     ticket.created_date
-                  )} by ${ticket.email}, ${ticket.company}`}</p>
+                  )} ${
+                    type === "user"
+                      ? ""
+                      : `by ${ticket.email}, ${ticket.company}`
+                  }`}</p>
                 </div>
               </Link>
             ))

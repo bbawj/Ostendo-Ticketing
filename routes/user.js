@@ -4,6 +4,7 @@ const { isAdmin } = require("../authMiddleware");
 const Joi = require("joi");
 const bcrypt = require("bcrypt");
 const transporter = require("../config/mail");
+const jwt = require("jsonwebtoken");
 
 const schema = Joi.object({
   email: Joi.string().required(),
@@ -42,12 +43,16 @@ router.post("/", isAdmin, async (req, res) => {
     const result = await pool.query("INSERT INTO users SET ?", user);
     // generate reset-password JWT
     jwt.sign(
-      { id: result.insertId },
-      req.body.password + "-" + process.env.RESET_PASSWORD_SECRET,
+      { id: result[0].insertId },
+      hashedPassword + "-" + process.env.RESET_PASSWORD_SECRET,
       { expiresIn: "5d" },
-      async (err, emailToken) => {
+      (err, emailToken) => {
+        if (err) {
+          console.log(err);
+          return res.status(500).json({ message: err });
+        }
         // send email notifs
-        const url = `http://128.199.72.149/reset/${result.insertId}/${emailToken}`;
+        const url = `http://128.199.72.149/reset/${result[0].insertId}/${emailToken}`;
         const output = `
       <h3>Ostendo Asia Ticketing is a website meant to help you track and log IT-related issues and tickets with ease.</h3>
       <h4>An administrator has created an account for you to track your most recent issue.</h4>

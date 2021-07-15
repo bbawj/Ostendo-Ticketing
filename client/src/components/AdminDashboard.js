@@ -1,7 +1,7 @@
 import { Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import React from "react";
-import AdminHome from "./AdminHome";
+import TicketList from "./TicketList";
 
 export default function AdminDashboard() {
   return (
@@ -12,7 +12,7 @@ export default function AdminDashboard() {
           <Link to="/admin">Admin Panel</Link>
         </Button>
       </div>
-      <AdminHome type="all" />
+      <TicketList type="all" />
     </div>
   );
 }

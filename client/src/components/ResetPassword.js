@@ -81,20 +81,18 @@ export default function ResetPassword() {
         {({ isSubmitting, status }) =>
           status !== "done" && (
             <Form>
-              <div className="formFlex">
-                <Field
-                  name="password"
-                  type="password"
-                  label="Password"
-                  as={MyTextField}
-                />
-                <Field
-                  name="passwordConfirm"
-                  type="password"
-                  label="Confirm Password"
-                  as={MyTextField}
-                />
-              </div>
+              <Field
+                name="password"
+                type="password"
+                label="Password"
+                as={MyTextField}
+              />
+              <Field
+                name="passwordConfirm"
+                type="password"
+                label="Confirm Password"
+                as={MyTextField}
+              />
               <Button disabled={isSubmitting} variant="contained" type="submit">
                 Submit
               </Button>

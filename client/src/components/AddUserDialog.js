@@ -171,7 +171,7 @@ export default function AddUserDialog({ info, setInfo }) {
             })}
             onSubmit={async (values, { setSubmitting }) => {
               setSubmitting(true);
-              setError(false);
+              setError("");
               try {
                 await axios.post("/api/user", values, {
                   withCredentials: true,

@@ -1,5 +1,13 @@
-.home > h2 {
+.adminPanelHeader {
   padding: 1em 0;
+  display: flex;
+  align-items: center;
+}
+
+.adminPanelHeader > .MuiButtonBase-root {
+  padding: 0;
+  padding-top: 0.25em;
+  align-items: center;
 }
 
 .addUserDialog {

@@ -1,7 +1,7 @@
 import React from "react";
 import { useUser } from "../contexts/UserContext";
 import AdminDashboard from "./AdminDashboard";
-import AdminHome from "./AdminHome";
+import TicketList from "./TicketList";
 import CreateTicket from "./CreateTicket";
 import ConfirmationNumberIcon from "@material-ui/icons/ConfirmationNumber";
 import "./Home.css";
@@ -19,7 +19,7 @@ export default function Home() {
             <h3>My Tickets</h3>
             <ConfirmationNumberIcon />
           </div>
-          <AdminHome type="user" />
+          <TicketList type="user" />
         </div>
       )}
     </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import Signup from "./Signup";
 import Header from "./Header";
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, Route } from "react-router-dom";
 import "./App.css";
 import Home from "./Home";
 import { createMuiTheme } from "@material-ui/core";
@@ -37,8 +37,8 @@ export default function App() {
             <RedirectRoute exact path="/" component={Login} />
             <RedirectRoute exact path="/login" component={Login} />
             <RedirectRoute path="/signup" component={Signup} />
-            <RedirectRoute path="/forgot-password" component={ForgotPassword} />
-            <RedirectRoute path="/reset/:id/:token" component={ResetPassword} />
+            <Route path="/forgot-password" component={ForgotPassword} />
+            <Route path="/reset/:id/:token" component={ResetPassword} />
             <PrivateRoute path="/home" component={Home} />
             <AdminRoute path="/admin" component={AdminPanel} />
             <PrivateRoute path="/ticket/:id" component={TicketPage} />
