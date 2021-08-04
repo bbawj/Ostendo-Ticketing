@@ -2,6 +2,8 @@ name: Deployment Workflow
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - "**/README.md"
 
 jobs:
   job_one:
